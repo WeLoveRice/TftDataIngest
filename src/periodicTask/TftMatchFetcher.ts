@@ -1,15 +1,8 @@
 import { Logger } from "winston";
 import { TftSummoner } from "../../models/TftSummoner";
-import { getMatchDetail, getParticipantFromMatch } from "../api/riot";
 import { createLogger } from "../Logger";
-import {
-  fetchLatestUnprocessedMatchId,
-  findSummonerByName,
-  insertMatchDetail,
-  insertMatchHistory,
-  insertParticipantResult,
-  matchDetailExists
-} from "../tft/database";
+import { insertDataForMatch } from "../tft/database/insert";
+import { fetchLatestUnprocessedMatchId, findSummonerByName } from "../tft/database/search";
 
 export class TftMatchFetcher {
   summonerName: string;
@@ -28,19 +21,6 @@ export class TftMatchFetcher {
     }
   }
 
-  async insertDataForMatch(matchId: string): Promise<void> {
-    const match = await getMatchDetail(matchId);
-    if (!(await matchDetailExists(match))) {
-      await insertMatchDetail(match);
-    }
-    const participant = await getParticipantFromMatch(match, this.summoner);
-    const participantResult = await insertParticipantResult(
-      participant,
-      this.summoner
-    );
-    await insertMatchHistory(participantResult, match, this.summoner);
-  }
-
   async execute(): Promise<void> {
     await this.initialiseSummoner();
     const matchId = await fetchLatestUnprocessedMatchId(this.summoner);
@@ -48,6 +28,6 @@ export class TftMatchFetcher {
       return;
     }
 
-    await this.insertDataForMatch(matchId);
+    await insertDataForMatch(matchId, this.summoner);
   }
 }
