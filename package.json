@@ -1,0 +1,37 @@
+{
+  "name": "tftdataingest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "ts-node-dev --transpile-only --respawn src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WeLoveRice/TftDataIngest.git"
+  },
+  "author": "Colin Cheung",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WeLoveRice/TftDataIngest/issues"
+  },
+  "homepage": "https://github.com/WeLoveRice/TftDataIngest#readme",
+  "dependencies": {
+    "sequelize": "^6.3.5",
+    "sleep-promise": "^9.0.0",
+    "twisted": "^1.31.0",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/request": "^2.48.5",
+    "@types/validator": "^13.1.0",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.1.2",
+    "ts-node-dev": "^1.0.0",
+    "typescript": "^4.0.5"
+  }
+}

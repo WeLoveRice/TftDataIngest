@@ -1,0 +1,8 @@
+logs/
+build/
+coverage/
+.env
+.env.dev
+sequelize.json
+node_modules
+database/db.env

@@ -1,0 +1,20 @@
+version: '3.7'
+
+services:
+  fetcher:
+    build:
+        context: .
+        dockerfile: ./Dockerfile
+    env_file: .env.dev
+    volumes:
+        - .:/home/node/fetcher
+    command: npm run start:dev
+    depends_on:
+        - postgres
+  postgres:
+    image: postgres:13-alpine
+    env_file: database/db.env
+    volumes:
+      - ./database/data:/var/lib/postgresql/data/
+    ports:
+      - 5432:5432
