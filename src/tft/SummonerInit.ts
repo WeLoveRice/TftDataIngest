@@ -13,17 +13,19 @@ export const initSummoner = async (summonerName: string) => {
   if (count > 0) {
     return;
   }
-  const transaction = await Postgres.getTransaction();
-  await TftSummoner.create(
-    {
-      encryptedPlayerUuid: response.puuid,
-      name: response.name,
-      encryptedSummonerId: response.id,
-      region: TftRegions.EUROPE,
-    },
-    { transaction }
-  );
+  const sequelize = await Postgres.getSequelize();
 
+  await sequelize.transaction(async (transaction) => {
+    await TftSummoner.create(
+      {
+        encryptedPlayerUuid: response.puuid,
+        name: response.name,
+        encryptedSummonerId: response.id,
+        region: TftRegions.EUROPE,
+      },
+      { transaction }
+    );
+  });
   const logger = createLogger();
   logger.info(`${summonerName} added to db`);
 };

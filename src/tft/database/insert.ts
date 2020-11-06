@@ -28,6 +28,7 @@ export const insertDataForMatch = async (
   matchId: string,
   summoner: TftSummoner
 ): Promise<void> => {
+  const transaction = await Postgres.getTransaction();
   const match = await getMatchDetail(matchId);
   if (!(await matchExists(match))) {
     await insertMatch(match);
@@ -36,11 +37,12 @@ export const insertDataForMatch = async (
   const participant = await insertParticipant(participantDto);
 
   // Only check rank if game was ranked
-  if (match.response.info.queue_id != Queue.RANKED_TFT) {
+  if (match.response.info.queue_id == Queue.RANKED_TFT) {
     await insertParticipantElo(participant, summoner);
   }
   await insertParaticipantLink(match, participant, summoner);
   await insertParticipantUnit(participant, participantDto.units);
+  await transaction.commit();
 };
 
 export const insertMatch = async ({
@@ -55,14 +57,19 @@ export const insertMatch = async ({
     tft_set_number,
   } = response.info;
 
-  const [result] = await TftMatch.upsert({
-    tftMatchId: response.metadata.match_id,
-    gameTimestamp: new Date(game_datetime),
-    gameLength: Math.round(game_length),
-    gameVersion: game_version,
-    queueId: queue_id,
-    tftSetNumber: tft_set_number,
-  });
+  const transaction = await Postgres.getTransaction();
+
+  const [result] = await TftMatch.upsert(
+    {
+      tftMatchId: response.metadata.match_id,
+      gameTimestamp: new Date(game_datetime),
+      gameLength: Math.round(game_length),
+      gameVersion: game_version,
+      queueId: queue_id,
+      tftSetNumber: tft_set_number,
+    },
+    { transaction }
+  );
 
   logger.info(`Inserted match_detail with ID: ${result.tftMatchId}`);
 
@@ -91,6 +98,7 @@ export const insertParticipant = async ({
     },
     { transaction }
   );
+
   logger.info(`Inserted participant with ID: ${participant.tftParticipantId}`);
 
   return participant;
