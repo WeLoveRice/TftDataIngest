@@ -7,7 +7,7 @@ const connect = async () => {
     POSTGRES_HOST,
     POSTGRES_USER,
     POSTGRES_PASSWORD,
-    POSTGRES_DB
+    POSTGRES_DB,
   } = process.env;
   if (!POSTGRES_HOST || !POSTGRES_DB || !POSTGRES_USER || !POSTGRES_PASSWORD) {
     throw new Error("POSTGRES env not set");
@@ -20,13 +20,14 @@ const connect = async () => {
     {
       host: POSTGRES_HOST,
       dialect: "postgres",
-      logging: msg => logger.info(msg)
+      logging: (msg) => logger.info(msg),
     }
   );
 
   await sequelize.authenticate();
   await sequelize.sync();
   await initModels(sequelize);
+  return sequelize;
 };
 
 export default { connect };

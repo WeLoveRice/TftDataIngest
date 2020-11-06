@@ -5,15 +5,17 @@ import { createLogger } from "../Logger";
 
 export const initSummoner = async (summonerName: string) => {
   const { response } = await getSummoner(summonerName);
-  const count = await TftSummoner.count({ where: { riotId: response.id } });
+  const count = await TftSummoner.count({
+    where: { encryptedSummonerId: response.id },
+  });
   if (count > 0) {
     return;
   }
 
   await TftSummoner.create({
-    puuid: response.puuid,
+    encryptedPlayerUuid: response.puuid,
     name: response.name,
-    riotId: response.id
+    encryptedSummonerId: response.id,
   });
 
   const logger = createLogger();

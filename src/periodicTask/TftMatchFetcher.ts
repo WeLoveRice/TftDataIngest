@@ -1,8 +1,12 @@
+import sleep from "sleep-promise";
 import { Logger } from "winston";
-import { TftSummoner } from "../../models/TftSummoner";
+import { TftSummoner } from "../../models/init-models";
 import { createLogger } from "../Logger";
 import { insertDataForMatch } from "../tft/database/insert";
-import { fetchLatestUnprocessedMatchId, findSummonerByName } from "../tft/database/search";
+import {
+  fetchLatestUnprocessedMatchId,
+  findSummonerByName,
+} from "../tft/database/search";
 
 export class TftMatchFetcher {
   summonerName: string;
@@ -15,15 +19,16 @@ export class TftMatchFetcher {
     this.logger = createLogger();
   }
 
-  async initialiseSummoner(): Promise<void> {
+  async getSummoner(): Promise<void> {
     if (!this.summoner) {
       this.summoner = await findSummonerByName(this.summonerName);
     }
   }
 
   async execute(): Promise<void> {
-    await this.initialiseSummoner();
+    await this.getSummoner();
     const matchId = await fetchLatestUnprocessedMatchId(this.summoner);
+    console.log(`summoner: ${this.summoner.name} | matchId: ${matchId}`);
     if (!matchId) {
       return;
     }
@@ -31,3 +36,20 @@ export class TftMatchFetcher {
     await insertDataForMatch(matchId, this.summoner);
   }
 }
+
+export const fetchMatches = async () => {
+  if (!process.env.LOL_USERS) {
+    return;
+  }
+
+  const summoners = process.env.LOL_USERS.split(",");
+  for (const summonerName of summoners) {
+    const matchFetcher = new TftMatchFetcher(summonerName);
+
+    setInterval(async () => {
+      await matchFetcher.execute();
+    }, 60 * 1000);
+
+    await sleep(1000);
+  }
+};
