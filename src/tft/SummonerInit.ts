@@ -1,5 +1,7 @@
 import sleep from "sleep-promise";
+import { TftRegions } from "twisted/dist/constants";
 import { TftSummoner } from "../../models/TftSummoner";
+import { Postgres } from "../api/postgres";
 import { getSummoner } from "../api/riot";
 import { createLogger } from "../Logger";
 
@@ -11,12 +13,16 @@ export const initSummoner = async (summonerName: string) => {
   if (count > 0) {
     return;
   }
-
-  await TftSummoner.create({
-    encryptedPlayerUuid: response.puuid,
-    name: response.name,
-    encryptedSummonerId: response.id,
-  });
+  const transaction = await Postgres.getTransaction();
+  await TftSummoner.create(
+    {
+      encryptedPlayerUuid: response.puuid,
+      name: response.name,
+      encryptedSummonerId: response.id,
+      region: TftRegions.EUROPE,
+    },
+    { transaction }
+  );
 
   const logger = createLogger();
   logger.info(`${summonerName} added to db`);

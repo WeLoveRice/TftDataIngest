@@ -2,15 +2,19 @@ import {
   ApiResponseDTO,
   MatchTFTDTO,
   ParticipantDto,
+  UnitDto,
 } from "twisted/dist/models-dto";
 import {
   TftElo,
   TftParticipant,
   TftParticipantElo,
   TftParticipantLink,
+  TftParticipantUnit,
+  TftUnit,
 } from "../../../models/init-models";
 import { TftMatch } from "../../../models/TftMatch";
 import { TftSummoner } from "../../../models/TftSummoner";
+import { Postgres } from "../../api/postgres";
 import {
   fetchLeagueBySummoner,
   getMatchDetail,
@@ -36,6 +40,7 @@ export const insertDataForMatch = async (
     await insertParticipantElo(participant, summoner);
   }
   await insertParaticipantLink(match, participant, summoner);
+  await insertParticipantUnit(participant, participantDto.units);
 };
 
 export const insertMatch = async ({
@@ -73,15 +78,19 @@ export const insertParticipant = async ({
   total_damage_to_players,
 }: ParticipantDto): Promise<TftParticipant> => {
   const logger = createLogger();
+  const transaction = await Postgres.getTransaction();
 
-  const participant = await TftParticipant.create({
-    level,
-    goldLeft: gold_left,
-    placement,
-    lastRound: last_round,
-    playersEliminated: players_eliminated,
-    totalDmgToPlayers: total_damage_to_players,
-  });
+  const participant = await TftParticipant.create(
+    {
+      level,
+      goldLeft: gold_left,
+      placement,
+      lastRound: last_round,
+      playersEliminated: players_eliminated,
+      totalDmgToPlayers: total_damage_to_players,
+    },
+    { transaction }
+  );
   logger.info(`Inserted participant with ID: ${participant.tftParticipantId}`);
 
   return participant;
@@ -92,6 +101,11 @@ const insertParticipantElo = async (
   summoner: TftSummoner
 ) => {
   const { response } = await fetchLeagueBySummoner(summoner);
+  if (response.length === 0) {
+    const logger = createLogger();
+    logger.info(`${summoner.name} does not have a rank`);
+    return;
+  }
   const { tier, rank, leaguePoints } = response[0];
 
   const elo = await TftElo.findOne({
@@ -102,10 +116,15 @@ const insertParticipantElo = async (
     },
   });
 
-  await TftParticipantElo.create({
-    tftEloId: elo?.tftEloId,
-    tftParticipantId: participant.tftParticipantId,
-  });
+  const transaction = await Postgres.getTransaction();
+
+  await TftParticipantElo.create(
+    {
+      tftEloId: elo?.tftEloId,
+      tftParticipantId: participant.tftParticipantId,
+    },
+    { transaction }
+  );
 };
 
 export const insertParaticipantLink = async (
@@ -114,13 +133,42 @@ export const insertParaticipantLink = async (
   summoner: TftSummoner
 ): Promise<TftParticipantLink> => {
   const logger = createLogger();
-  const result = await TftParticipantLink.create({
-    tftMatchId: response.metadata.match_id,
-    tftParticipantId: participant.tftParticipantId,
-    tftSummonerId: summoner.tftSummonerId,
-  });
+  const transaction = await Postgres.getTransaction();
+
+  const result = await TftParticipantLink.create(
+    {
+      tftMatchId: response.metadata.match_id,
+      tftParticipantId: participant.tftParticipantId,
+      tftSummonerId: summoner.tftSummonerId,
+    },
+    { transaction }
+  );
 
   logger.info(`Inserted participant_link with ID: ${result.tftParticipantId}`);
 
   return result;
+};
+
+export const insertParticipantUnit = async (
+  participant: TftParticipant,
+  units: UnitDto[]
+) => {
+  for await (const unit of units) {
+    const tftUnit = await TftUnit.findOne({
+      where: {
+        tftCharacterId: unit.character_id,
+        tier: unit.tier,
+        chosen: unit.chosen ? unit.chosen : "None",
+      },
+    });
+
+    const transaction = await Postgres.getTransaction();
+    await TftParticipantUnit.create(
+      {
+        tftParticipantId: participant.tftParticipantId,
+        tftUnitId: tftUnit?.tftUnitId,
+      },
+      { transaction }
+    );
+  }
 };

@@ -2,25 +2,25 @@
 
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
-export interface TftParticipantEloAttributes {
-  tftParticipantsEloId?: number;
+export interface TftParticipantUnitAttributes {
+  tftParticipantUnitId?: number;
   tftParticipantId?: number;
-  tftEloId?: number;
+  tftUnitId?: number;
 }
 
-export class TftParticipantElo extends Model<TftParticipantEloAttributes, TftParticipantEloAttributes> implements TftParticipantEloAttributes {
-  tftParticipantsEloId?: number;
+export class TftParticipantUnit extends Model<TftParticipantUnitAttributes, TftParticipantUnitAttributes> implements TftParticipantUnitAttributes {
+  tftParticipantUnitId?: number;
   tftParticipantId?: number;
-  tftEloId?: number;
+  tftUnitId?: number;
 
   static initModel(sequelize: Sequelize) {
-    TftParticipantElo.init({
-    tftParticipantsEloId: {
+    TftParticipantUnit.init({
+    tftParticipantUnitId: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      field: 'tft_participants_elo_id'
+      field: 'tft_participant_unit_id'
     },
     tftParticipantId: {
       type: DataTypes.INTEGER,
@@ -31,30 +31,26 @@ export class TftParticipantElo extends Model<TftParticipantEloAttributes, TftPar
       },
       field: 'tft_participant_id'
     },
-    tftEloId: {
+    tftUnitId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'tft_elo',
-        key: 'tft_elo_id'
-      },
-      field: 'tft_elo_id'
+      allowNull: true,
+      field: 'tft_unit_id'
     }
   }, {
     sequelize,
-    tableName: 'tft_participant_elo',
+    tableName: 'tft_participant_unit',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "tft_participant_elo_pkey",
+        name: "tft_participant_unit_pkey",
         unique: true,
         fields: [
-          { name: "tft_participants_elo_id" },
+          { name: "tft_participant_unit_id" },
         ]
       },
     ]
   });
-  return TftParticipantElo;
+  return TftParticipantUnit;
   }
 }

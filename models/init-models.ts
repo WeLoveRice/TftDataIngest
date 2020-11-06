@@ -13,7 +13,9 @@ import { TftMatch, TftMatchAttributes } from "./TftMatch";
 import { TftParticipant, TftParticipantAttributes } from "./TftParticipant";
 import { TftParticipantElo, TftParticipantEloAttributes } from "./TftParticipantElo";
 import { TftParticipantLink, TftParticipantLinkAttributes } from "./TftParticipantLink";
+import { TftParticipantUnit, TftParticipantUnitAttributes } from "./TftParticipantUnit";
 import { TftSummoner, TftSummonerAttributes } from "./TftSummoner";
+import { TftUnit, TftUnitAttributes } from "./TftUnit";
 
 export {
   AssetChampions, AssetChampionsAttributes,
@@ -30,7 +32,9 @@ export {
   TftParticipant, TftParticipantAttributes,
   TftParticipantElo, TftParticipantEloAttributes,
   TftParticipantLink, TftParticipantLinkAttributes,
+  TftParticipantUnit, TftParticipantUnitAttributes,
   TftSummoner, TftSummonerAttributes,
+  TftUnit, TftUnitAttributes,
 };
 
 export function initModels(sequelize: Sequelize) {
@@ -48,7 +52,9 @@ export function initModels(sequelize: Sequelize) {
   TftParticipant.initModel(sequelize);
   TftParticipantElo.initModel(sequelize);
   TftParticipantLink.initModel(sequelize);
+  TftParticipantUnit.initModel(sequelize);
   TftSummoner.initModel(sequelize);
+  TftUnit.initModel(sequelize);
 
   TftParticipantElo.belongsTo(TftElo, { foreignKey: "tftEloId"});
   TftElo.hasMany(TftParticipantElo, { foreignKey: "tftEloId"});
@@ -60,6 +66,8 @@ export function initModels(sequelize: Sequelize) {
   TftParticipant.hasOne(TftParticipantLink, { foreignKey: "tftParticipantId"});
   TftParticipantLink.belongsTo(TftSummoner, { foreignKey: "tftSummonerId"});
   TftSummoner.hasMany(TftParticipantLink, { foreignKey: "tftSummonerId"});
+  TftParticipantUnit.belongsTo(TftParticipant, { foreignKey: "tftParticipantId"});
+  TftParticipant.hasMany(TftParticipantUnit, { foreignKey: "tftParticipantId"});
 
   return {
     AssetChampions,
@@ -76,6 +84,8 @@ export function initModels(sequelize: Sequelize) {
     TftParticipant,
     TftParticipantElo,
     TftParticipantLink,
+    TftParticipantUnit,
     TftSummoner,
+    TftUnit,
   };
 }
