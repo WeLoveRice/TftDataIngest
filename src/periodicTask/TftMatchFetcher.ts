@@ -28,7 +28,7 @@ export class TftMatchFetcher {
   async execute(): Promise<void> {
     await this.getSummoner();
     const matchId = await fetchLatestUnprocessedMatchId(this.summoner);
-    console.log(`summoner: ${this.summoner.name} | matchId: ${matchId}`);
+
     if (!matchId) {
       return;
     }

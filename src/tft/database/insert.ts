@@ -16,6 +16,7 @@ import {
   getMatchDetail,
   getParticipantFromMatch,
 } from "../../api/riot";
+import { Queue } from "../../enum/Queue";
 import { createLogger } from "../../Logger";
 import { matchExists } from "./search";
 
@@ -29,7 +30,11 @@ export const insertDataForMatch = async (
   }
   const participantDto = await getParticipantFromMatch(match, summoner);
   const participant = await insertParticipant(participantDto);
-  await insertParticipantElo(participant, summoner);
+
+  // Only check rank if game was ranked
+  if (match.response.info.queue_id != Queue.RANKED_TFT) {
+    await insertParticipantElo(participant, summoner);
+  }
   await insertParaticipantLink(match, participant, summoner);
 };
 
