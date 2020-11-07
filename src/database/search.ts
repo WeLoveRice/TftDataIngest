@@ -1,13 +1,13 @@
 import { ApiResponseDTO, MatchTFTDTO } from "twisted/dist/models-dto";
-import { TftParticipantLink, TftSummoner } from "../../../models/init-models";
-import { TftMatch } from "../../../models/TftMatch";
-import { getMatchHistory } from "../../api/riot";
+import { TftParticipantLink, TftSummoner } from "../../models/init-models";
+import { TftMatch } from "../../models/TftMatch";
+import { getMatchHistory } from "../api/riot";
 
 export const findSummonerByName = async (
   name: string
 ): Promise<TftSummoner> => {
   const summoner = await TftSummoner.findOne({
-    where: { name },
+    where: { summonerName: name },
   });
 
   if (!summoner) {

@@ -2,11 +2,11 @@ import sleep from "sleep-promise";
 import { Logger } from "winston";
 import { TftSummoner } from "../../models/init-models";
 import { createLogger } from "../Logger";
-import { insertDataForMatch } from "../tft/database/insert";
+import { insertDataForMatchAndSummoner } from "../database/insert";
 import {
   fetchLatestUnprocessedMatchId,
   findSummonerByName,
-} from "../tft/database/search";
+} from "../database/search";
 
 export class TftMatchFetcher {
   summonerName: string;
@@ -33,7 +33,7 @@ export class TftMatchFetcher {
       return;
     }
 
-    await insertDataForMatch(matchId, this.summoner);
+    await insertDataForMatchAndSummoner(matchId, this.summoner);
   }
 }
 
