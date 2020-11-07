@@ -23,6 +23,7 @@ export class TftParticipantLink extends Model<TftParticipantLinkAttributes, TftP
         model: 'tft_participant',
         key: 'tft_participant_id'
       },
+      unique: "tft_participant_match_unq",
       field: 'tft_participant_id'
     },
     tftMatchId: {
@@ -32,6 +33,7 @@ export class TftParticipantLink extends Model<TftParticipantLinkAttributes, TftP
         model: 'tft_match',
         key: 'tft_match_id'
       },
+      unique: "tft_participant_match_unq",
       field: 'tft_match_id'
     },
     tftSummonerId: {
@@ -41,6 +43,7 @@ export class TftParticipantLink extends Model<TftParticipantLinkAttributes, TftP
         model: 'tft_summoner',
         key: 'tft_summoner_id'
       },
+      unique: "tft_match_summoner",
       field: 'tft_summoner_id'
     }
   }, {
@@ -62,10 +65,26 @@ export class TftParticipantLink extends Model<TftParticipantLinkAttributes, TftP
         ]
       },
       {
+        name: "tft_match_summoner",
+        unique: true,
+        fields: [
+          { name: "tft_match_id" },
+          { name: "tft_summoner_id" },
+        ]
+      },
+      {
         name: "tft_participant_link_pkey",
         unique: true,
         fields: [
           { name: "tft_participant_id" },
+        ]
+      },
+      {
+        name: "tft_participant_match_unq",
+        unique: true,
+        fields: [
+          { name: "tft_participant_id" },
+          { name: "tft_match_id" },
         ]
       },
     ]

@@ -7,9 +7,12 @@ import { TftMatch } from "../models/TftMatch";
 import { getParticipantFromMatch, getTftApi } from "./api/riot";
 import { TftRegions } from "twisted/dist/constants";
 import {
+  TftParticipant,
   TftParticipantLink,
+  TftParticipantTrait,
   TftParticipantUnit,
   TftSummoner,
+  TftTrait,
   TftUnit,
 } from "../models/init-models";
 import sleep from "sleep-promise";

@@ -9,7 +9,9 @@ import {
   TftParticipant,
   TftParticipantElo,
   TftParticipantLink,
+  TftParticipantTrait,
   TftParticipantUnit,
+  TftTrait,
   TftUnit,
 } from "../../../models/init-models";
 import { TftMatch } from "../../../models/TftMatch";
@@ -42,7 +44,9 @@ export const insertDataForMatch = async (
   }
   await insertParaticipantLink(match, participant, summoner);
   await insertParticipantUnit(participant, participantDto.units);
+  await insertParticipantTrait(participantDto, participant);
   await transaction.commit();
+  await Postgres.newTransaction();
 };
 
 export const insertMatch = async ({
@@ -175,6 +179,30 @@ export const insertParticipantUnit = async (
       {
         tftParticipantId: participant.tftParticipantId,
         tftUnitId: tftUnit?.tftUnitId,
+      },
+      { transaction }
+    );
+  }
+};
+
+export const insertParticipantTrait = async (
+  participantDto: ParticipantDto,
+  participant: TftParticipant
+) => {
+  const transaction = await Postgres.getTransaction();
+  for await (const traitDto of participantDto.traits) {
+    const trait = await TftTrait.findOne({
+      where: {
+        tftTraitName: traitDto.name,
+        tierCurrent: traitDto.tier_current,
+      },
+    });
+
+    await TftParticipantTrait.create(
+      {
+        tftParticipantId: participant?.tftParticipantId,
+        tftTraitId: trait?.tftTraitId,
+        numUnits: traitDto.num_units,
       },
       { transaction }
     );

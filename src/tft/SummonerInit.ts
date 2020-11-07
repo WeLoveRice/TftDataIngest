@@ -19,13 +19,14 @@ export const initSummoner = async (summonerName: string) => {
     await TftSummoner.create(
       {
         encryptedPlayerUuid: response.puuid,
-        name: response.name,
+        summonerName: response.name,
         encryptedSummonerId: response.id,
-        region: TftRegions.EUROPE,
+        summonerRegion: TftRegions.EUROPE,
       },
       { transaction }
     );
   });
+  await Postgres.newTransaction();
   const logger = createLogger();
   logger.info(`${summonerName} added to db`);
 };

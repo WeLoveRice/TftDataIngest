@@ -4,18 +4,18 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 
 export interface TftSummonerAttributes {
   tftSummonerId?: number;
-  name?: string;
+  summonerName?: string;
   encryptedPlayerUuid?: string;
   encryptedSummonerId?: string;
-  region?: string;
+  summonerRegion?: string;
 }
 
 export class TftSummoner extends Model<TftSummonerAttributes, TftSummonerAttributes> implements TftSummonerAttributes {
   tftSummonerId?: number;
-  name?: string;
+  summonerName?: string;
   encryptedPlayerUuid?: string;
   encryptedSummonerId?: string;
-  region?: string;
+  summonerRegion?: string;
 
   static initModel(sequelize: Sequelize) {
     TftSummoner.init({
@@ -26,9 +26,10 @@ export class TftSummoner extends Model<TftSummonerAttributes, TftSummonerAttribu
       primaryKey: true,
       field: 'tft_summoner_id'
     },
-    name: {
+    summonerName: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
+      field: 'summoner_name'
     },
     encryptedPlayerUuid: {
       type: DataTypes.TEXT,
@@ -41,9 +42,10 @@ export class TftSummoner extends Model<TftSummonerAttributes, TftSummonerAttribu
       unique: "riot_id_unq",
       field: 'encrypted_summoner_id'
     },
-    region: {
+    summonerRegion: {
       type: DataTypes.TEXT,
-      allowNull: false
+      allowNull: false,
+      field: 'summoner_region'
     }
   }, {
     sequelize,

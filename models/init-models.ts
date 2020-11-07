@@ -13,8 +13,10 @@ import { TftMatch, TftMatchAttributes } from "./TftMatch";
 import { TftParticipant, TftParticipantAttributes } from "./TftParticipant";
 import { TftParticipantElo, TftParticipantEloAttributes } from "./TftParticipantElo";
 import { TftParticipantLink, TftParticipantLinkAttributes } from "./TftParticipantLink";
+import { TftParticipantTrait, TftParticipantTraitAttributes } from "./TftParticipantTrait";
 import { TftParticipantUnit, TftParticipantUnitAttributes } from "./TftParticipantUnit";
 import { TftSummoner, TftSummonerAttributes } from "./TftSummoner";
+import { TftTrait, TftTraitAttributes } from "./TftTrait";
 import { TftUnit, TftUnitAttributes } from "./TftUnit";
 
 export {
@@ -32,8 +34,10 @@ export {
   TftParticipant, TftParticipantAttributes,
   TftParticipantElo, TftParticipantEloAttributes,
   TftParticipantLink, TftParticipantLinkAttributes,
+  TftParticipantTrait, TftParticipantTraitAttributes,
   TftParticipantUnit, TftParticipantUnitAttributes,
   TftSummoner, TftSummonerAttributes,
+  TftTrait, TftTraitAttributes,
   TftUnit, TftUnitAttributes,
 };
 
@@ -52,8 +56,10 @@ export function initModels(sequelize: Sequelize) {
   TftParticipant.initModel(sequelize);
   TftParticipantElo.initModel(sequelize);
   TftParticipantLink.initModel(sequelize);
+  TftParticipantTrait.initModel(sequelize);
   TftParticipantUnit.initModel(sequelize);
   TftSummoner.initModel(sequelize);
+  TftTrait.initModel(sequelize);
   TftUnit.initModel(sequelize);
 
   TftParticipantElo.belongsTo(TftElo, { foreignKey: "tftEloId"});
@@ -62,10 +68,12 @@ export function initModels(sequelize: Sequelize) {
   TftParticipant.hasMany(TftParticipantElo, { foreignKey: "tftParticipantId"});
   TftParticipantLink.belongsTo(TftMatch, { foreignKey: "tftMatchId"});
   TftMatch.hasMany(TftParticipantLink, { foreignKey: "tftMatchId"});
+  TftParticipantLink.belongsTo(TftSummoner, { foreignKey: "tftSummonerId"});
+  TftSummoner.hasOne(TftParticipantLink, { foreignKey: "tftSummonerId"});
   TftParticipantLink.belongsTo(TftParticipant, { foreignKey: "tftParticipantId"});
   TftParticipant.hasOne(TftParticipantLink, { foreignKey: "tftParticipantId"});
-  TftParticipantLink.belongsTo(TftSummoner, { foreignKey: "tftSummonerId"});
-  TftSummoner.hasMany(TftParticipantLink, { foreignKey: "tftSummonerId"});
+  TftParticipantTrait.belongsTo(TftParticipant, { foreignKey: "tftParticipantId"});
+  TftParticipant.hasMany(TftParticipantTrait, { foreignKey: "tftParticipantId"});
   TftParticipantUnit.belongsTo(TftParticipant, { foreignKey: "tftParticipantId"});
   TftParticipant.hasMany(TftParticipantUnit, { foreignKey: "tftParticipantId"});
 
@@ -84,8 +92,10 @@ export function initModels(sequelize: Sequelize) {
     TftParticipant,
     TftParticipantElo,
     TftParticipantLink,
+    TftParticipantTrait,
     TftParticipantUnit,
     TftSummoner,
+    TftTrait,
     TftUnit,
   };
 }

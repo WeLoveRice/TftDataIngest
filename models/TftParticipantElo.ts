@@ -29,6 +29,7 @@ export class TftParticipantElo extends Model<TftParticipantEloAttributes, TftPar
         model: 'tft_participant',
         key: 'tft_participant_id'
       },
+      unique: "tft_participant_elo_unq",
       field: 'tft_participant_id'
     },
     tftEloId: {
@@ -38,6 +39,7 @@ export class TftParticipantElo extends Model<TftParticipantEloAttributes, TftPar
         model: 'tft_elo',
         key: 'tft_elo_id'
       },
+      unique: "tft_participant_elo_unq",
       field: 'tft_elo_id'
     }
   }, {
@@ -51,6 +53,14 @@ export class TftParticipantElo extends Model<TftParticipantEloAttributes, TftPar
         unique: true,
         fields: [
           { name: "tft_participants_elo_id" },
+        ]
+      },
+      {
+        name: "tft_participant_elo_unq",
+        unique: true,
+        fields: [
+          { name: "tft_participant_id" },
+          { name: "tft_elo_id" },
         ]
       },
     ]

@@ -33,7 +33,7 @@ export class TftParticipantUnit extends Model<TftParticipantUnitAttributes, TftP
     },
     tftUnitId: {
       type: DataTypes.INTEGER,
-      allowNull: true,
+      allowNull: false,
       field: 'tft_unit_id'
     }
   }, {

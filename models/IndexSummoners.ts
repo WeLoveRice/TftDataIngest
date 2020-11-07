@@ -3,6 +3,7 @@
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
 export interface IndexSummonersAttributes {
+  uuid?: string;
   summonerName?: string;
   id?: string;
   accountId?: string;
@@ -10,6 +11,7 @@ export interface IndexSummonersAttributes {
 }
 
 export class IndexSummoners extends Model<IndexSummonersAttributes, IndexSummonersAttributes> implements IndexSummonersAttributes {
+  uuid?: string;
   summonerName?: string;
   id?: string;
   accountId?: string;
@@ -17,10 +19,14 @@ export class IndexSummoners extends Model<IndexSummonersAttributes, IndexSummone
 
   static initModel(sequelize: Sequelize) {
     IndexSummoners.init({
-    summonerName: {
+    uuid: {
       type: DataTypes.TEXT,
       allowNull: false,
       primaryKey: true
+    },
+    summonerName: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     id: {
       type: DataTypes.TEXT,
@@ -44,7 +50,7 @@ export class IndexSummoners extends Model<IndexSummonersAttributes, IndexSummone
         name: "index_summoners_pkey",
         unique: true,
         fields: [
-          { name: "summonerName" },
+          { name: "uuid" },
         ]
       },
     ]
