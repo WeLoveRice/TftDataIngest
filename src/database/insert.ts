@@ -8,6 +8,7 @@ import { insertParticipantElo } from "./insert/participantElo";
 import { insertParaticipantLink } from "./insert/participantLink";
 import { insertParticipantTrait } from "./insert/participantTrait";
 import { insertParticipantUnit } from "./insert/participantUnit";
+import { insertParticipantUnitItem } from "./insert/participantUnitItem";
 import { matchExists } from "./search";
 
 export const insertDataForMatchAndSummoner = async (
@@ -26,9 +27,12 @@ export const insertDataForMatchAndSummoner = async (
   if (match.response.info.queue_id == Queue.RANKED_TFT) {
     await insertParticipantElo(participant, summoner);
   }
+
   await insertParaticipantLink(match, participant, summoner);
   await insertParticipantUnit(participant, participantDto.units);
-  await insertParticipantTrait(participantDto, participant);
+  await insertParticipantUnitItem(participant, participantDto);
+  await insertParticipantTrait(participant, participantDto);
+
   await transaction.commit();
   await Postgres.newTransaction();
 };

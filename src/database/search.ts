@@ -1,5 +1,9 @@
-import { ApiResponseDTO, MatchTFTDTO } from "twisted/dist/models-dto";
-import { TftParticipantLink, TftSummoner } from "../../models/init-models";
+import { ApiResponseDTO, MatchTFTDTO, UnitDto } from "twisted/dist/models-dto";
+import {
+  TftParticipantLink,
+  TftSummoner,
+  TftUnit,
+} from "../../models/init-models";
 import { TftMatch } from "../../models/TftMatch";
 import { getMatchHistory } from "../api/riot";
 
@@ -46,4 +50,14 @@ export const matchExists = async ({
   });
 
   return result > 0;
+};
+
+export const findTftUnitByDto = async (unit: UnitDto) => {
+  return TftUnit.findOne({
+    where: {
+      tftCharacterId: unit.character_id,
+      tier: unit.tier,
+      chosen: unit.chosen ? unit.chosen : "None",
+    },
+  });
 };

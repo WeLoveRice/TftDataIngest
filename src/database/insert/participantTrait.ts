@@ -7,8 +7,8 @@ import {
 import { Postgres } from "../../api/postgres";
 
 export const insertParticipantTrait = async (
-  participantDto: ParticipantDto,
-  participant: TftParticipant
+  participant: TftParticipant,
+  participantDto: ParticipantDto
 ) => {
   const transaction = await Postgres.getTransaction();
   for await (const traitDto of participantDto.traits) {

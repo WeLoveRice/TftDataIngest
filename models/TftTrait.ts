@@ -25,11 +25,13 @@ export class TftTrait extends Model<TftTraitAttributes, TftTraitAttributes> impl
     tftTraitName: {
       type: DataTypes.TEXT,
       allowNull: false,
+      unique: "tft_trait_name_tier_current_unq",
       field: 'tft_trait_name'
     },
     tierCurrent: {
       type: DataTypes.SMALLINT,
       allowNull: false,
+      unique: "tft_trait_name_tier_current_unq",
       field: 'tier_current'
     }
   }, {
@@ -38,6 +40,14 @@ export class TftTrait extends Model<TftTraitAttributes, TftTraitAttributes> impl
     schema: 'public',
     timestamps: false,
     indexes: [
+      {
+        name: "tft_trait_name_tier_current_unq",
+        unique: true,
+        fields: [
+          { name: "tft_trait_name" },
+          { name: "tier_current" },
+        ]
+      },
       {
         name: "tft_trait_pkey",
         unique: true,

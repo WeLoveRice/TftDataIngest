@@ -29,6 +29,7 @@ export class TftSummoner extends Model<TftSummonerAttributes, TftSummonerAttribu
     summonerName: {
       type: DataTypes.TEXT,
       allowNull: false,
+      unique: "tft_summoner_name_region_unq",
       field: 'summoner_name'
     },
     encryptedPlayerUuid: {
@@ -45,6 +46,7 @@ export class TftSummoner extends Model<TftSummonerAttributes, TftSummonerAttribu
     summonerRegion: {
       type: DataTypes.TEXT,
       allowNull: false,
+      unique: "tft_summoner_name_region_unq",
       field: 'summoner_region'
     }
   }, {
@@ -58,6 +60,14 @@ export class TftSummoner extends Model<TftSummonerAttributes, TftSummonerAttribu
         unique: true,
         fields: [
           { name: "encrypted_summoner_id" },
+        ]
+      },
+      {
+        name: "tft_summoner_name_region_unq",
+        unique: true,
+        fields: [
+          { name: "summoner_name" },
+          { name: "summoner_region" },
         ]
       },
       {
