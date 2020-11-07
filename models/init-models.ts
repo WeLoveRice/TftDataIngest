@@ -3,10 +3,12 @@ import { AssetChampions, AssetChampionsAttributes } from "./AssetChampions";
 import { AssetItems, AssetItemsAttributes } from "./AssetItems";
 import { AssetTraits, AssetTraitsAttributes } from "./AssetTraits";
 import { IndexMatches, IndexMatchesAttributes } from "./IndexMatches";
+import { IndexSummoners, IndexSummonersAttributes } from "./IndexSummoners";
 import { ProcessedMatches, ProcessedMatchesAttributes } from "./ProcessedMatches";
 import { ProcessedTraits, ProcessedTraitsAttributes } from "./ProcessedTraits";
 import { ProcessedUnits, ProcessedUnitsAttributes } from "./ProcessedUnits";
 import { RawSet4, RawSet4Attributes } from "./RawSet4";
+import { RawSummoners, RawSummonersAttributes } from "./RawSummoners";
 import { TftElo, TftEloAttributes } from "./TftElo";
 import { TftItem, TftItemAttributes } from "./TftItem";
 import { TftMatch, TftMatchAttributes } from "./TftMatch";
@@ -25,10 +27,12 @@ export {
   AssetItems, AssetItemsAttributes,
   AssetTraits, AssetTraitsAttributes,
   IndexMatches, IndexMatchesAttributes,
+  IndexSummoners, IndexSummonersAttributes,
   ProcessedMatches, ProcessedMatchesAttributes,
   ProcessedTraits, ProcessedTraitsAttributes,
   ProcessedUnits, ProcessedUnitsAttributes,
   RawSet4, RawSet4Attributes,
+  RawSummoners, RawSummonersAttributes,
   TftElo, TftEloAttributes,
   TftItem, TftItemAttributes,
   TftMatch, TftMatchAttributes,
@@ -48,10 +52,12 @@ export function initModels(sequelize: Sequelize) {
   AssetItems.initModel(sequelize);
   AssetTraits.initModel(sequelize);
   IndexMatches.initModel(sequelize);
+  IndexSummoners.initModel(sequelize);
   ProcessedMatches.initModel(sequelize);
   ProcessedTraits.initModel(sequelize);
   ProcessedUnits.initModel(sequelize);
   RawSet4.initModel(sequelize);
+  RawSummoners.initModel(sequelize);
   TftElo.initModel(sequelize);
   TftItem.initModel(sequelize);
   TftMatch.initModel(sequelize);
@@ -89,10 +95,12 @@ export function initModels(sequelize: Sequelize) {
     AssetItems,
     AssetTraits,
     IndexMatches,
+    IndexSummoners,
     ProcessedMatches,
     ProcessedTraits,
     ProcessedUnits,
     RawSet4,
+    RawSummoners,
     TftElo,
     TftItem,
     TftMatch,

@@ -18,7 +18,6 @@ export const insertParticipantTrait = async (
         tierCurrent: traitDto.tier_current,
       },
     });
-
     await TftParticipantTrait.create(
       {
         tftParticipantId: participant?.tftParticipantId,

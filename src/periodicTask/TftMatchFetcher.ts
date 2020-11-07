@@ -34,6 +34,7 @@ export class TftMatchFetcher {
     }
 
     await insertDataForMatchAndSummoner(matchId, this.summoner);
+    setTimeout(async () => await this.execute(), 60 * 1000);
   }
 }
 
@@ -46,10 +47,7 @@ export const fetchMatches = async () => {
   for (const summonerName of summoners) {
     const matchFetcher = new TftMatchFetcher(summonerName);
 
-    setInterval(async () => {
-      await matchFetcher.execute();
-    }, 60 * 1000);
-
+    await matchFetcher.execute();
     await sleep(1000);
   }
 };

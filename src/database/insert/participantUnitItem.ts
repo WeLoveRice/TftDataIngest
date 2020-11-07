@@ -25,8 +25,8 @@ export const insertParticipantUnitItem = async (
           tftParticipantId: participant.tftParticipantId,
           tftUnitId: tftUnit?.tftUnitId,
         },
+        transaction,
       });
-
       await TftParticipantUnitItem.create(
         {
           tftParticipantUnitId: tftParticipantUnit?.tftParticipantUnitId,

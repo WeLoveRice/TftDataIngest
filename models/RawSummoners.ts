@@ -2,40 +2,34 @@
 
 import { DataTypes, Model, Sequelize } from 'sequelize';
 
-export interface IndexSummonersAttributes {
+export interface RawSummonersAttributes {
   uuid?: string;
-  summonerName?: string;
-  puuid?: string;
+  json?: string;
 }
 
-export class IndexSummoners extends Model<IndexSummonersAttributes, IndexSummonersAttributes> implements IndexSummonersAttributes {
+export class RawSummoners extends Model<RawSummonersAttributes, RawSummonersAttributes> implements RawSummonersAttributes {
   uuid?: string;
-  summonerName?: string;
-  puuid?: string;
+  json?: string;
 
   static initModel(sequelize: Sequelize) {
-    IndexSummoners.init({
+    RawSummoners.init({
     uuid: {
       type: DataTypes.TEXT,
       allowNull: false,
       primaryKey: true
     },
-    summonerName: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    },
-    puuid: {
+    json: {
       type: DataTypes.TEXT,
       allowNull: true
     }
   }, {
     sequelize,
-    tableName: 'index_summoners',
+    tableName: 'raw_summoners',
     schema: 'public',
     timestamps: false,
     indexes: [
       {
-        name: "index_summoners_pkey",
+        name: "raw_summoners_pkey",
         unique: true,
         fields: [
           { name: "uuid" },
@@ -43,6 +37,6 @@ export class IndexSummoners extends Model<IndexSummonersAttributes, IndexSummone
       },
     ]
   });
-  return IndexSummoners;
+  return RawSummoners;
   }
 }
