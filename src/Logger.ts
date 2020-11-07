@@ -12,12 +12,12 @@ export const createLogger = (): Logger => {
     datePattern: "YYYY-MM-DD",
     zippedArchive: true,
     maxSize: "20m",
-    maxFiles: "14d"
+    maxFiles: "14d",
   });
 
   return winston.createLogger({
     format: format.combine(format.timestamp(), format.json()),
     // Error messages also go to console
-    transports: [new Console({ level: "error" }), dailyRotate]
+    transports: [new Console({ level: "error" }), dailyRotate],
   });
 };

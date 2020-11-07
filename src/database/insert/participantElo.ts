@@ -4,6 +4,7 @@ import {
   TftParticipantElo,
   TftSummoner,
 } from "../../../models/init-models";
+import { Postgres } from "../../api/postgres";
 import { fetchLeagueBySummoner } from "../../api/riot";
 import { createLogger } from "../../Logger";
 
