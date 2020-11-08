@@ -6,7 +6,7 @@ import { insertDataForMatchAndSummoner } from "../database/insert";
 import { findSummonerByName } from "../database/search";
 import { fetchLatestUnprocessedMatchId } from "../database/matchFinder";
 
-export class TftMatchFetcher {
+export class TftSummonerMatchFetcher {
   summonerName: string;
   summoner!: TftSummoner;
   interval = 30 * 1000;
@@ -24,6 +24,7 @@ export class TftMatchFetcher {
   }
 
   async execute(): Promise<void> {
+    this.logger.info(`Periodic check for ${this.summonerName}`);
     await this.getSummoner();
     const matchId = await fetchLatestUnprocessedMatchId(this.summoner);
 
@@ -42,12 +43,12 @@ export const fetchMatches = async () => {
 
   const summoners = process.env.LOL_USERS.split(",");
   for (const summonerName of summoners) {
-    const matchFetcher = new TftMatchFetcher(summonerName);
+    const matchFetcher = new TftSummonerMatchFetcher(summonerName);
 
     await matchFetcher.execute();
 
     setInterval(async () => {
       await matchFetcher.execute();
-    }, 60 * 1000);
+    }, 10 * 60 * 1000);
   }
 };

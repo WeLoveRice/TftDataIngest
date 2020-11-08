@@ -1,6 +1,7 @@
 import fs from "fs-extra";
 import path from "path";
 import sleep from "sleep-promise";
+import { createLogger } from "../../Logger";
 import { Redis } from "../redis";
 
 const keysFile = path.resolve(__dirname, "..", "..", "..", "riot-api-keys.txt");
@@ -20,7 +21,7 @@ export const addKeysToRedis = async () => {
 
 export const getKey = async () => {
   const redis = await Redis.getConnection();
-  const [redisKey, apiKey] = await redis.blpop(REDIS_RIOT_KEYS, 100);
+  const [redisKey, apiKey] = await redis.blpop(REDIS_RIOT_KEYS, 0);
 
   if (await redis.get(apiKey)) {
     await sleep(1200);

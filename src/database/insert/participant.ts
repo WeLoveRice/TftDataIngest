@@ -1,4 +1,4 @@
-import { Transaction } from "sequelize/types";
+import { Transaction } from "sequelize";
 import { ParticipantDto } from "twisted/dist/models-dto";
 import { TftParticipant } from "../../../models/init-models";
 import { Postgres } from "../../api/postgres";

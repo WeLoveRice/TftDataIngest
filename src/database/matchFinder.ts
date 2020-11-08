@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import { Constants } from "twisted";
 import { Regions, TftRegions } from "twisted/dist/constants";
 import { TftParticipantLink, TftSummoner } from "../../models/init-models";
@@ -7,9 +8,7 @@ import { releaseKey } from "../api/riot/keyManager";
 import { getTftApi } from "../api/riot/riot";
 import { initSummonerApiKey } from "./summonerApiKeyInit";
 
-export const fetchLatestUnprocessedMatchId = async (
-  summoner: TftSummoner
-): Promise<string | null> => {
+const fetchMatchListBySummoner = async (summoner: TftSummoner) => {
   const [tftApi, apiKey] = await getTftApi();
   const tftApiKey = await TftApiKey.findOne({ where: { riotApiKey: apiKey } });
   let tftSummonerApiKey = await TftSummonerApiKey.findOne({
@@ -30,6 +29,13 @@ export const fetchLatestUnprocessedMatchId = async (
   );
 
   await releaseKey(apiKey);
+  return matches;
+};
+
+export const fetchLatestUnprocessedMatchId = async (
+  summoner: TftSummoner
+): Promise<string | null> => {
+  const matches = await fetchMatchListBySummoner(summoner);
   const result = await TftParticipantLink.count({
     where: {
       tftSummonerId: summoner.tftSummonerId,
@@ -42,4 +48,21 @@ export const fetchLatestUnprocessedMatchId = async (
   }
 
   return matches.response[0];
+};
+
+export const fetchRecentUnprocessedMatches = async (
+  summoner: TftSummoner
+): Promise<string[]> => {
+  const { response } = await fetchMatchListBySummoner(summoner);
+  const links = await TftParticipantLink.findAll({
+    where: {
+      tftSummonerId: summoner.tftSummonerId,
+      tftMatchId: {
+        [Op.in]: response,
+      },
+    },
+  });
+
+  const matchIdsInDb = links.map((link) => link.tftMatchId);
+  return response.filter((matchId) => !matchIdsInDb.includes(matchId));
 };

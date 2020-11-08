@@ -1,12 +1,10 @@
-import { Transaction } from "sequelize/types";
+import { Transaction } from "sequelize";
 import { ApiResponseDTO, MatchTFTDTO } from "twisted/dist/models-dto";
 import {
   TftParticipant,
   TftParticipantLink,
   TftSummoner,
 } from "../../../models/init-models";
-import { Postgres } from "../../api/postgres";
-import { createLogger } from "../../Logger";
 
 export const insertParticipantLink = async (
   { response }: ApiResponseDTO<MatchTFTDTO>,
@@ -14,9 +12,7 @@ export const insertParticipantLink = async (
   summoner: TftSummoner,
   transaction: Transaction
 ): Promise<TftParticipantLink> => {
-  const logger = createLogger();
-
-  const result = await TftParticipantLink.create(
+  return TftParticipantLink.create(
     {
       tftMatchId: response.metadata.match_id,
       tftParticipantId: participant.tftParticipantId,
@@ -24,8 +20,4 @@ export const insertParticipantLink = async (
     },
     { transaction }
   );
-
-  logger.info(`Inserted participant_link with ID: ${result.tftParticipantId}`);
-
-  return result;
 };

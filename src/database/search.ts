@@ -1,16 +1,7 @@
 import { Constants } from "twisted";
 import { ApiResponseDTO, MatchTFTDTO, UnitDto } from "twisted/dist/models-dto";
-import {
-  TftParticipantLink,
-  TftSummoner,
-  TftUnit,
-} from "../../models/init-models";
-import { TftApiKey } from "../../models/TftApiKey";
+import { TftSummoner, TftUnit } from "../../models/init-models";
 import { TftMatch } from "../../models/TftMatch";
-import { TftSummonerApiKey } from "../../models/TftSummonerApiKey";
-import { releaseKey } from "../api/riot/keyManager";
-import { getMatchHistory, getTftApi } from "../api/riot/riot";
-
 export const findSummonerByName = async (
   name: string
 ): Promise<TftSummoner> => {

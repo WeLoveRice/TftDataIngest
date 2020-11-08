@@ -1,4 +1,8 @@
-import { Regions } from "twisted/dist/constants";
+import { Transaction } from "sequelize/types";
+import sleep from "sleep-promise";
+import { TftApi } from "twisted";
+import { Regions, TftRegions } from "twisted/dist/constants";
+import { TftApiKey, TftSummonerApiKey } from "../../models/init-models";
 import { TftSummoner } from "../../models/TftSummoner";
 import { getSummoner } from "../api/riot/riot";
 import { createLogger } from "../Logger";
@@ -30,4 +34,50 @@ export const initialiseSummoners = async () => {
   for await (const summonerName of summoners) {
     await initSummoner(summonerName);
   }
+};
+
+export const initSummonerByApiKey = async (
+  summonerPuuid: string,
+  apiKey: string,
+  transaction: Transaction
+) => {
+  const tftApiKey = await TftApiKey.findOne({ where: { riotApiKey: apiKey } });
+
+  const tftSummonerApiKey = await TftSummonerApiKey.findOne({
+    where: {
+      tftApiKeyId: tftApiKey?.tftApiKeyId,
+      encryptedPlayerUuid: summonerPuuid,
+    },
+    transaction,
+  });
+
+  if (tftSummonerApiKey) {
+    return TftSummoner.findByPk(tftSummonerApiKey.tftSummonerId);
+  }
+  const tftApi = new TftApi(apiKey);
+  const summonerDto = await tftApi.Summoner.getByPUUID(
+    summonerPuuid,
+    Regions.EU_WEST
+  );
+  await sleep(1200);
+
+  const [tftSummoner] = await TftSummoner.findOrCreate({
+    where: {
+      summonerName: summonerDto.response.name,
+      summonerRegion: Regions.EU_WEST,
+    },
+    transaction,
+  });
+
+  await TftSummonerApiKey.create(
+    {
+      tftSummonerId: tftSummoner?.tftSummonerId,
+      tftApiKeyId: tftApiKey?.tftApiKeyId,
+      encryptedPlayerUuid: summonerDto.response.puuid,
+      encryptedSummonerId: summonerDto.response.id,
+    },
+    { transaction }
+  );
+
+  return tftSummoner;
 };

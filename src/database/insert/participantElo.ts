@@ -1,4 +1,4 @@
-import { Transaction } from "sequelize/types";
+import { Transaction } from "sequelize";
 import {
   TftElo,
   TftParticipant,
@@ -9,6 +9,8 @@ import { TftSummonerApiKey } from "../../../models/TftSummonerApiKey";
 import { fetchLeagueBySummonerApiKey } from "../../api/riot/riot";
 import { createLogger } from "../../Logger";
 
+// We need to be specific with which api key we used as we can only
+// fetch a summoner with their corresponding api key
 export const insertParticipantElo = async (
   participant: TftParticipant,
   tftSummonerApiKey: TftSummonerApiKey,

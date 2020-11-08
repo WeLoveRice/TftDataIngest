@@ -6,7 +6,7 @@ export class Postgres {
   static sequelize: Sequelize;
 
   static async getSequelize() {
-    const logger = createLogger();
+    const logger = createLogger("POSTGRES");
 
     const {
       POSTGRES_HOST,
