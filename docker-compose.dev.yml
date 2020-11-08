@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  fetcher:
+  ingest:
     build:
         context: .
         dockerfile: ./Dockerfile
@@ -11,6 +11,13 @@ services:
     command: npm run start
     depends_on:
         - postgres
+        - redis
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    sysctls:
+        - net.core.somaxconn=511
   postgres:
     image: postgres:13-alpine
     env_file: database/db.env

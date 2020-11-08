@@ -1,26 +1,13 @@
 import { createLogger } from "./Logger";
+import { initKeys } from "./api/riot/keyManager";
 import { fetchMatches } from "./periodicTask/TftMatchFetcher";
-import { Postgres } from "./api/postgres";
 import { initialiseSummoners } from "./database/SummonerInit";
-import path from "path";
-import fs from "fs";
-import { TftItem } from "../models/TftItem";
-import {
-  TftElo,
-  TftParticipantLink,
-  TftParticipantUnit,
-  TftSummoner,
-  TftSummonerElo,
-  TftUnit,
-} from "../models/init-models";
-import { getParticipantFromMatch, getTftApi } from "./api/riot";
-import { Regions, TftRegions } from "twisted/dist/constants";
-import { TftParticipantUnitItem } from "../models/TftParticipantUnitItem";
-import sleep from "sleep-promise";
+import { Postgres } from "./api/postgres";
 
 export const main = async (): Promise<void> => {
   try {
     await Postgres.getSequelize();
+    await initKeys();
     await initialiseSummoners();
     await fetchMatches();
   } catch (e) {

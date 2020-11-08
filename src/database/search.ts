@@ -5,7 +5,7 @@ import {
   TftUnit,
 } from "../../models/init-models";
 import { TftMatch } from "../../models/TftMatch";
-import { getMatchHistory } from "../api/riot";
+import { getMatchHistory } from "../api/riot/riot";
 
 export const findSummonerByName = async (
   name: string

@@ -5,7 +5,7 @@ import {
   TftParticipantElo,
   TftSummoner,
 } from "../../../models/init-models";
-import { fetchLeagueBySummoner } from "../../api/riot";
+import { fetchLeagueBySummoner } from "../../api/riot/riot";
 import { createLogger } from "../../Logger";
 
 export const insertParticipantElo = async (

@@ -3,10 +3,10 @@ import { Regions } from "twisted/dist/constants";
 import { TftSummonerElo } from "../../models/init-models";
 import { TftElo } from "../../models/TftElo";
 import { TftSummoner } from "../../models/TftSummoner";
-import { getTftApi } from "../api/riot";
+import { getTftApi } from "../api/riot/riot";
 
 export const ingestMasterSummoners = async () => {
-  const tftApi = getTftApi();
+  const [tftApi, key] = await getTftApi();
   const league = await tftApi.League.getMasterLeague(Regions.EU_WEST);
   const eloTime = new Date();
   let count = 0;

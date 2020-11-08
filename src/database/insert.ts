@@ -1,6 +1,6 @@
 import { TftSummoner } from "../../models/TftSummoner";
 import { Postgres } from "../api/postgres";
-import { getMatchDetail, getParticipantFromMatch } from "../api/riot";
+import { getMatchDetail, getParticipantFromMatch } from "../api/riot/riot";
 import { Queue } from "../enum/Queue";
 import { insertMatch } from "./insert/match";
 import { insertParticipant } from "./insert/participant";

@@ -2,7 +2,7 @@ import sleep from "sleep-promise";
 import { Regions, TftRegions } from "twisted/dist/constants";
 import { TftSummoner } from "../../models/TftSummoner";
 import { Postgres } from "../api/postgres";
-import { getSummoner } from "../api/riot";
+import { getSummoner } from "../api/riot/riot";
 import { createLogger } from "../Logger";
 
 export const initSummoner = async (summonerName: string) => {
@@ -42,6 +42,5 @@ export const initialiseSummoners = async () => {
   const summoners = process.env.LOL_USERS.split(",");
   for await (const summonerName of summoners) {
     await initSummoner(summonerName);
-    await sleep(1000);
   }
 };

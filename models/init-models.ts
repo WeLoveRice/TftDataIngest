@@ -3,6 +3,7 @@ import { AssetChampions, AssetChampionsAttributes } from "./AssetChampions";
 import { AssetItems, AssetItemsAttributes } from "./AssetItems";
 import { AssetTraits, AssetTraitsAttributes } from "./AssetTraits";
 import { IndexMatches, IndexMatchesAttributes } from "./IndexMatches";
+import { IndexPuuid, IndexPuuidAttributes } from "./IndexPuuid";
 import { IndexSummoners, IndexSummonersAttributes } from "./IndexSummoners";
 import { ProcessedMatches, ProcessedMatchesAttributes } from "./ProcessedMatches";
 import { ProcessedTraits, ProcessedTraitsAttributes } from "./ProcessedTraits";
@@ -29,6 +30,7 @@ export {
   AssetItems, AssetItemsAttributes,
   AssetTraits, AssetTraitsAttributes,
   IndexMatches, IndexMatchesAttributes,
+  IndexPuuid, IndexPuuidAttributes,
   IndexSummoners, IndexSummonersAttributes,
   ProcessedMatches, ProcessedMatchesAttributes,
   ProcessedTraits, ProcessedTraitsAttributes,
@@ -56,6 +58,7 @@ export function initModels(sequelize: Sequelize) {
   AssetItems.initModel(sequelize);
   AssetTraits.initModel(sequelize);
   IndexMatches.initModel(sequelize);
+  IndexPuuid.initModel(sequelize);
   IndexSummoners.initModel(sequelize);
   ProcessedMatches.initModel(sequelize);
   ProcessedTraits.initModel(sequelize);
@@ -105,6 +108,7 @@ export function initModels(sequelize: Sequelize) {
     AssetItems,
     AssetTraits,
     IndexMatches,
+    IndexPuuid,
     IndexSummoners,
     ProcessedMatches,
     ProcessedTraits,

@@ -7,41 +7,47 @@ import {
   SummonerV4DTO,
 } from "twisted/dist/models-dto";
 import { LeagueEntryDTO } from "twisted/dist/models-dto/league/tft-league";
-import { TftSummoner } from "../../models/TftSummoner";
+import { TftSummoner } from "../../../models/TftSummoner";
+import { getKey, releaseKey } from "./keyManager";
 
-export const getTftApi = () => {
-  if (!process.env.RIOT_API) {
-    throw Error("RIOT_API env not defined");
-  }
-  return new TftApi(process.env.RIOT_API);
+export const getTftApi = async (): Promise<[TftApi, string]> => {
+  const key = await getKey();
+
+  return [new TftApi(key), key];
 };
 
 export const getSummoner = async (
   summonerName: string
 ): Promise<ApiResponseDTO<SummonerV4DTO>> => {
-  const api = getTftApi();
+  const [api, key] = await getTftApi();
+
   const summoner = await api.Summoner.getByName(
     summonerName,
     Constants.Regions.EU_WEST
   );
 
+  releaseKey(key);
   return summoner;
 };
 
 export const getMatchHistory = async (summonerPUUID: string) => {
-  const api = getTftApi();
+  const [api, key] = await getTftApi();
   const matches = await api.Match.list(
     summonerPUUID,
     Constants.TftRegions.EUROPE
   );
+
+  releaseKey(key);
   return matches;
 };
 
 export const getMatchDetail = async (
   matchId: string
 ): Promise<ApiResponseDTO<MatchTFTDTO>> => {
-  const api = getTftApi();
+  const [api, key] = await getTftApi();
   const match = await api.Match.get(matchId, Constants.TftRegions.EUROPE);
+
+  releaseKey(key);
   return match;
 };
 
@@ -59,6 +65,8 @@ export const getParticipantFromMatch = (
 export const fetchLeagueBySummoner = async (
   summoner: TftSummoner
 ): Promise<ApiResponseDTO<LeagueEntryDTO[]>> => {
-  const api = getTftApi();
+  const [api, key] = await getTftApi();
+
+  releaseKey(key);
   return api.League.get(summoner.encryptedSummonerId, Regions.EU_WEST);
 };
