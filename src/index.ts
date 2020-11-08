@@ -6,13 +6,15 @@ import path from "path";
 import fs from "fs";
 import { TftItem } from "../models/TftItem";
 import {
+  TftElo,
   TftParticipantLink,
   TftParticipantUnit,
   TftSummoner,
+  TftSummonerElo,
   TftUnit,
 } from "../models/init-models";
 import { getParticipantFromMatch, getTftApi } from "./api/riot";
-import { TftRegions } from "twisted/dist/constants";
+import { Regions, TftRegions } from "twisted/dist/constants";
 import { TftParticipantUnitItem } from "../models/TftParticipantUnitItem";
 import sleep from "sleep-promise";
 

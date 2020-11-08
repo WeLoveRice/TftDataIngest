@@ -1,5 +1,5 @@
 import sleep from "sleep-promise";
-import { TftRegions } from "twisted/dist/constants";
+import { Regions, TftRegions } from "twisted/dist/constants";
 import { TftSummoner } from "../../models/TftSummoner";
 import { Postgres } from "../api/postgres";
 import { getSummoner } from "../api/riot";
@@ -21,7 +21,7 @@ export const initSummoner = async (summonerName: string) => {
         encryptedPlayerUuid: response.puuid,
         summonerName: response.name,
         encryptedSummonerId: response.id,
-        summonerRegion: TftRegions.EUROPE,
+        summonerRegion: Regions.EU_WEST,
       },
       { transaction }
     );

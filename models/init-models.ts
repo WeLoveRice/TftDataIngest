@@ -7,6 +7,7 @@ import { IndexSummoners, IndexSummonersAttributes } from "./IndexSummoners";
 import { ProcessedMatches, ProcessedMatchesAttributes } from "./ProcessedMatches";
 import { ProcessedTraits, ProcessedTraitsAttributes } from "./ProcessedTraits";
 import { ProcessedUnits, ProcessedUnitsAttributes } from "./ProcessedUnits";
+import { RawMatches, RawMatchesAttributes } from "./RawMatches";
 import { RawSet4, RawSet4Attributes } from "./RawSet4";
 import { RawSummoners, RawSummonersAttributes } from "./RawSummoners";
 import { TftElo, TftEloAttributes } from "./TftElo";
@@ -19,6 +20,7 @@ import { TftParticipantTrait, TftParticipantTraitAttributes } from "./TftPartici
 import { TftParticipantUnit, TftParticipantUnitAttributes } from "./TftParticipantUnit";
 import { TftParticipantUnitItem, TftParticipantUnitItemAttributes } from "./TftParticipantUnitItem";
 import { TftSummoner, TftSummonerAttributes } from "./TftSummoner";
+import { TftSummonerElo, TftSummonerEloAttributes } from "./TftSummonerElo";
 import { TftTrait, TftTraitAttributes } from "./TftTrait";
 import { TftUnit, TftUnitAttributes } from "./TftUnit";
 
@@ -31,6 +33,7 @@ export {
   ProcessedMatches, ProcessedMatchesAttributes,
   ProcessedTraits, ProcessedTraitsAttributes,
   ProcessedUnits, ProcessedUnitsAttributes,
+  RawMatches, RawMatchesAttributes,
   RawSet4, RawSet4Attributes,
   RawSummoners, RawSummonersAttributes,
   TftElo, TftEloAttributes,
@@ -43,6 +46,7 @@ export {
   TftParticipantUnit, TftParticipantUnitAttributes,
   TftParticipantUnitItem, TftParticipantUnitItemAttributes,
   TftSummoner, TftSummonerAttributes,
+  TftSummonerElo, TftSummonerEloAttributes,
   TftTrait, TftTraitAttributes,
   TftUnit, TftUnitAttributes,
 };
@@ -56,6 +60,7 @@ export function initModels(sequelize: Sequelize) {
   ProcessedMatches.initModel(sequelize);
   ProcessedTraits.initModel(sequelize);
   ProcessedUnits.initModel(sequelize);
+  RawMatches.initModel(sequelize);
   RawSet4.initModel(sequelize);
   RawSummoners.initModel(sequelize);
   TftElo.initModel(sequelize);
@@ -68,6 +73,7 @@ export function initModels(sequelize: Sequelize) {
   TftParticipantUnit.initModel(sequelize);
   TftParticipantUnitItem.initModel(sequelize);
   TftSummoner.initModel(sequelize);
+  TftSummonerElo.initModel(sequelize);
   TftTrait.initModel(sequelize);
   TftUnit.initModel(sequelize);
 
@@ -89,6 +95,10 @@ export function initModels(sequelize: Sequelize) {
   TftItem.hasMany(TftParticipantUnitItem, { foreignKey: "tftItemId"});
   TftParticipantUnitItem.belongsTo(TftParticipantUnit, { foreignKey: "tftParticipantUnitId"});
   TftParticipantUnit.hasMany(TftParticipantUnitItem, { foreignKey: "tftParticipantUnitId"});
+  TftSummonerElo.belongsTo(TftElo, { foreignKey: "tftEloId"});
+  TftElo.hasMany(TftSummonerElo, { foreignKey: "tftEloId"});
+  TftSummonerElo.belongsTo(TftSummoner, { foreignKey: "tftSummonerId"});
+  TftSummoner.hasMany(TftSummonerElo, { foreignKey: "tftSummonerId"});
 
   return {
     AssetChampions,
@@ -99,6 +109,7 @@ export function initModels(sequelize: Sequelize) {
     ProcessedMatches,
     ProcessedTraits,
     ProcessedUnits,
+    RawMatches,
     RawSet4,
     RawSummoners,
     TftElo,
@@ -111,6 +122,7 @@ export function initModels(sequelize: Sequelize) {
     TftParticipantUnit,
     TftParticipantUnitItem,
     TftSummoner,
+    TftSummonerElo,
     TftTrait,
     TftUnit,
   };

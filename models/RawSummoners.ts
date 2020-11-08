@@ -4,12 +4,12 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 
 export interface RawSummonersAttributes {
   uuid?: string;
-  json?: string;
+  json?: any;
 }
 
 export class RawSummoners extends Model<RawSummonersAttributes, RawSummonersAttributes> implements RawSummonersAttributes {
   uuid?: string;
-  json?: string;
+  json?: any;
 
   static initModel(sequelize: Sequelize) {
     RawSummoners.init({
@@ -19,7 +19,7 @@ export class RawSummoners extends Model<RawSummonersAttributes, RawSummonersAttr
       primaryKey: true
     },
     json: {
-      type: DataTypes.TEXT,
+      type: DataTypes.JSONB,
       allowNull: true
     }
   }, {
