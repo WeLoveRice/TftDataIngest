@@ -7,3 +7,4 @@ sequelize.json
 node_modules
 database/db.env
 set4
+riot-api-keys.txt
