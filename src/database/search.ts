@@ -1,11 +1,15 @@
+import { Constants } from "twisted";
 import { ApiResponseDTO, MatchTFTDTO, UnitDto } from "twisted/dist/models-dto";
 import {
   TftParticipantLink,
   TftSummoner,
   TftUnit,
 } from "../../models/init-models";
+import { TftApiKey } from "../../models/TftApiKey";
 import { TftMatch } from "../../models/TftMatch";
-import { getMatchHistory } from "../api/riot/riot";
+import { TftSummonerApiKey } from "../../models/TftSummonerApiKey";
+import { releaseKey } from "../api/riot/keyManager";
+import { getMatchHistory, getTftApi } from "../api/riot/riot";
 
 export const findSummonerByName = async (
   name: string
@@ -19,25 +23,6 @@ export const findSummonerByName = async (
   }
 
   return summoner;
-};
-
-export const fetchLatestUnprocessedMatchId = async (
-  summoner: TftSummoner
-): Promise<string | null> => {
-  const matches = await getMatchHistory(summoner.encryptedPlayerUuid);
-
-  const result = await TftParticipantLink.count({
-    where: {
-      tftSummonerId: summoner.tftSummonerId,
-      tftMatchId: matches.response[0],
-    },
-  });
-
-  if (result > 0) {
-    return null;
-  }
-
-  return matches.response[0];
 };
 
 export const matchExists = async ({

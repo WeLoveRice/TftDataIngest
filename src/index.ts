@@ -1,13 +1,15 @@
 import { createLogger } from "./Logger";
-import { initKeys } from "./api/riot/keyManager";
+import { addKeysToRedis } from "./api/riot/keyManager";
 import { fetchMatches } from "./periodicTask/TftMatchFetcher";
-import { initialiseSummoners } from "./database/SummonerInit";
+import { initialiseSummoners } from "./database/summonerInit";
 import { Postgres } from "./api/postgres";
+import { upsertApiKeys } from "./database/apiKeyInit";
 
 export const main = async (): Promise<void> => {
   try {
     await Postgres.getSequelize();
-    await initKeys();
+    await upsertApiKeys();
+    await addKeysToRedis();
     await initialiseSummoners();
     await fetchMatches();
   } catch (e) {

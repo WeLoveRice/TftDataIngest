@@ -6,7 +6,7 @@ import { Redis } from "../redis";
 const keysFile = path.resolve(__dirname, "..", "..", "..", "riot-api-keys.txt");
 const REDIS_RIOT_KEYS = "RIOT_KEYS";
 
-export const initKeys = async () => {
+export const addKeysToRedis = async () => {
   const data = await fs.readFile(keysFile, "utf-8");
   const keys = data.split("\n").filter((value) => value);
   console.log(keys);
@@ -21,6 +21,10 @@ export const initKeys = async () => {
 export const getKey = async () => {
   const redis = await Redis.getConnection();
   const [redisKey, apiKey] = await redis.blpop(REDIS_RIOT_KEYS, 100);
+
+  if (await redis.get(apiKey)) {
+    await sleep(1200);
+  }
   if (!apiKey) {
     throw new Error("Timeout waiting for key");
   }
@@ -28,9 +32,8 @@ export const getKey = async () => {
   return apiKey;
 };
 
-export const releaseKey = (key: string) => {
-  setTimeout(async () => {
-    const redis = await Redis.getConnection();
-    await redis.rpush(REDIS_RIOT_KEYS, key);
-  }, 1200);
+export const releaseKey = async (key: string) => {
+  await sleep(1200);
+  const redis = await Redis.getConnection();
+  await redis.rpush(REDIS_RIOT_KEYS, key);
 };

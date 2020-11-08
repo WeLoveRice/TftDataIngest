@@ -5,18 +5,22 @@ import {
   TftParticipantElo,
   TftSummoner,
 } from "../../../models/init-models";
-import { fetchLeagueBySummoner } from "../../api/riot/riot";
+import { TftSummonerApiKey } from "../../../models/TftSummonerApiKey";
+import { fetchLeagueBySummonerApiKey } from "../../api/riot/riot";
 import { createLogger } from "../../Logger";
 
 export const insertParticipantElo = async (
   participant: TftParticipant,
-  summoner: TftSummoner,
+  tftSummonerApiKey: TftSummonerApiKey,
   transaction: Transaction
 ) => {
-  const { response } = await fetchLeagueBySummoner(summoner);
+  const { response } = await fetchLeagueBySummonerApiKey(tftSummonerApiKey);
   if (response.length === 0) {
     const logger = createLogger();
-    logger.info(`${summoner.summonerName} does not have a rank`);
+    const summoner = await TftSummoner.findByPk(
+      tftSummonerApiKey.tftSummonerId
+    );
+    logger.info(`${summoner?.summonerName} does not have a rank`);
     return;
   }
   const { tier, rank, leaguePoints } = response[0];

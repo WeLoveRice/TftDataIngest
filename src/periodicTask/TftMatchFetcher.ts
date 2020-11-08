@@ -3,10 +3,8 @@ import { Logger } from "winston";
 import { TftSummoner } from "../../models/init-models";
 import { createLogger } from "../Logger";
 import { insertDataForMatchAndSummoner } from "../database/insert";
-import {
-  fetchLatestUnprocessedMatchId,
-  findSummonerByName,
-} from "../database/search";
+import { findSummonerByName } from "../database/search";
+import { fetchLatestUnprocessedMatchId } from "../database/matchFinder";
 
 export class TftMatchFetcher {
   summonerName: string;

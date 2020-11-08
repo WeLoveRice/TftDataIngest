@@ -20,12 +20,15 @@ export const insertDataForMatchAndSummoner = async (
   if (!(await matchExists(match))) {
     await insertMatch(match, transaction);
   }
-  const participantDto = await getParticipantFromMatch(match, summoner);
+  const [participantDto, tftSummonerApiKey] = await getParticipantFromMatch(
+    match,
+    summoner
+  );
   const participant = await insertParticipant(participantDto, transaction);
 
   // Only check rank if game was ranked
   if (match.response.info.queue_id == Queue.RANKED_TFT) {
-    await insertParticipantElo(participant, summoner, transaction);
+    await insertParticipantElo(participant, tftSummonerApiKey, transaction);
   }
 
   await insertParticipantLink(match, participant, summoner, transaction);

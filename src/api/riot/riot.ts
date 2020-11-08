@@ -7,7 +7,10 @@ import {
   SummonerV4DTO,
 } from "twisted/dist/models-dto";
 import { LeagueEntryDTO } from "twisted/dist/models-dto/league/tft-league";
+import { TftApiKey } from "../../../models/TftApiKey";
 import { TftSummoner } from "../../../models/TftSummoner";
+import { TftSummonerApiKey } from "../../../models/TftSummonerApiKey";
+import { Redis } from "../redis";
 import { getKey, releaseKey } from "./keyManager";
 
 export const getTftApi = async (): Promise<[TftApi, string]> => {
@@ -26,7 +29,7 @@ export const getSummoner = async (
     Constants.Regions.EU_WEST
   );
 
-  releaseKey(key);
+  await releaseKey(key);
   return summoner;
 };
 
@@ -37,7 +40,7 @@ export const getMatchHistory = async (summonerPUUID: string) => {
     Constants.TftRegions.EUROPE
   );
 
-  releaseKey(key);
+  await releaseKey(key);
   return matches;
 };
 
@@ -47,26 +50,42 @@ export const getMatchDetail = async (
   const [api, key] = await getTftApi();
   const match = await api.Match.get(matchId, Constants.TftRegions.EUROPE);
 
-  releaseKey(key);
+  await releaseKey(key);
   return match;
 };
 
-export const getParticipantFromMatch = (
+export const getParticipantFromMatch = async (
   match: ApiResponseDTO<MatchTFTDTO>,
   summoner: TftSummoner
-): ParticipantDto => {
-  const participantIndex = match.response.metadata.participants.findIndex(
-    (id) => id == summoner.encryptedPlayerUuid
-  );
+): Promise<[ParticipantDto, TftSummonerApiKey]> => {
+  const tftSummonerApiKeys = await TftSummonerApiKey.findAll({
+    where: {
+      tftSummonerId: summoner.tftSummonerId,
+    },
+  });
 
-  return match.response.info.participants[participantIndex];
+  for (const summonerApikey of tftSummonerApiKeys) {
+    const participantIndex = match.response.metadata.participants.findIndex(
+      (id) => id == summonerApikey.encryptedPlayerUuid
+    );
+    if (participantIndex != -1) {
+      const participant = match.response.info.participants[participantIndex];
+      return [participant, summonerApikey];
+    }
+  }
+  throw new Error(
+    `Could not find participant. MatchId: ${match.response.metadata.match_id} | summoner_name: ${summoner.summonerName}`
+  );
 };
 
-export const fetchLeagueBySummoner = async (
-  summoner: TftSummoner
+export const fetchLeagueBySummonerApiKey = async (
+  summonerApiKey: TftSummonerApiKey
 ): Promise<ApiResponseDTO<LeagueEntryDTO[]>> => {
-  const [api, key] = await getTftApi();
+  const tftApiKey = await TftApiKey.findByPk(summonerApiKey.tftApiKeyId);
 
-  releaseKey(key);
-  return api.League.get(summoner.encryptedSummonerId, Regions.EU_WEST);
+  const redis = await Redis.getConnection();
+  await redis.psetex(tftApiKey?.riotApiKey, 1200, true);
+
+  const tftApi = new TftApi(tftApiKey?.riotApiKey);
+  return tftApi.League.get(summonerApiKey.encryptedSummonerId, Regions.EU_WEST);
 };
