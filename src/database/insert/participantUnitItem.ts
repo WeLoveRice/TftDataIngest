@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize/types";
 import { ParticipantDto } from "twisted/dist/models-dto";
 import {
   TftParticipant,
@@ -9,10 +10,9 @@ import { findTftUnitByDto } from "../search";
 
 export const insertParticipantUnitItem = async (
   participant: TftParticipant,
-  participantDto: ParticipantDto
+  participantDto: ParticipantDto,
+  transaction: Transaction
 ) => {
-  const transaction = await Postgres.getTransaction();
-
   for (const unit of participantDto.units) {
     if (unit.items.length == 0) {
       continue;

@@ -4,7 +4,6 @@ import { createLogger } from "../Logger";
 
 export class Postgres {
   static sequelize: Sequelize;
-  static transaciton: Transaction;
 
   static async getSequelize() {
     const logger = createLogger();
@@ -45,18 +44,8 @@ export class Postgres {
     return Postgres.sequelize;
   }
 
-  static async getTransaction() {
-    const sequelize = await Postgres.getSequelize();
-    if (Postgres.transaciton) {
-      return Postgres.transaciton;
-    }
-
-    Postgres.transaciton = await sequelize.transaction();
-    return Postgres.transaciton;
-  }
-
   static async newTransaction() {
     const sequelize = await Postgres.getSequelize();
-    Postgres.transaciton = await sequelize.transaction();
+    return sequelize.transaction();
   }
 }

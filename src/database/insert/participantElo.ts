@@ -1,16 +1,17 @@
+import { Transaction } from "sequelize/types";
 import {
   TftElo,
   TftParticipant,
   TftParticipantElo,
   TftSummoner,
 } from "../../../models/init-models";
-import { Postgres } from "../../api/postgres";
 import { fetchLeagueBySummoner } from "../../api/riot";
 import { createLogger } from "../../Logger";
 
 export const insertParticipantElo = async (
   participant: TftParticipant,
-  summoner: TftSummoner
+  summoner: TftSummoner,
+  transaction: Transaction
 ) => {
   const { response } = await fetchLeagueBySummoner(summoner);
   if (response.length === 0) {
@@ -27,8 +28,6 @@ export const insertParticipantElo = async (
       lp: leaguePoints,
     },
   });
-
-  const transaction = await Postgres.getTransaction();
 
   await TftParticipantElo.create(
     {

@@ -1,12 +1,11 @@
+import { Transaction } from "sequelize/types";
 import { ApiResponseDTO, MatchTFTDTO } from "twisted/dist/models-dto";
 import { TftMatch } from "../../../models/TftMatch";
-import { Postgres } from "../../api/postgres";
-import { createLogger } from "../../Logger";
 
-export const insertMatch = async ({
-  response,
-}: ApiResponseDTO<MatchTFTDTO>): Promise<TftMatch> => {
-  const logger = createLogger();
+export const insertMatch = async (
+  { response }: ApiResponseDTO<MatchTFTDTO>,
+  transaction: Transaction
+): Promise<TftMatch> => {
   const {
     game_datetime,
     game_length,
@@ -14,8 +13,6 @@ export const insertMatch = async ({
     queue_id,
     tft_set_number,
   } = response.info;
-
-  const transaction = await Postgres.getTransaction();
 
   const [result] = await TftMatch.upsert(
     {
@@ -28,8 +25,6 @@ export const insertMatch = async ({
     },
     { transaction }
   );
-
-  logger.info(`Inserted match_detail with ID: ${result.tftMatchId}`);
 
   return result;
 };

@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize/types";
 import { ApiResponseDTO, MatchTFTDTO } from "twisted/dist/models-dto";
 import {
   TftParticipant,
@@ -7,13 +8,13 @@ import {
 import { Postgres } from "../../api/postgres";
 import { createLogger } from "../../Logger";
 
-export const insertParaticipantLink = async (
+export const insertParticipantLink = async (
   { response }: ApiResponseDTO<MatchTFTDTO>,
   participant: TftParticipant,
-  summoner: TftSummoner
+  summoner: TftSummoner,
+  transaction: Transaction
 ): Promise<TftParticipantLink> => {
   const logger = createLogger();
-  const transaction = await Postgres.getTransaction();
 
   const result = await TftParticipantLink.create(
     {
