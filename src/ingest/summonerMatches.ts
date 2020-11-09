@@ -1,4 +1,5 @@
 import { Op } from "sequelize";
+import sleep from "sleep-promise";
 import { TftSummoner, TftSummonerElo } from "../../models/init-models";
 import { insertDataForMatch } from "../database/insert";
 import { fetchRecentUnprocessedMatches } from "../database/matchFinder";
@@ -6,7 +7,7 @@ import { fetchRecentUnprocessedMatches } from "../database/matchFinder";
 export const ingestDataForHighElo = async () => {
   const summonerElos = await TftSummonerElo.findAll({
     where: {
-      tftSummonerEloId: {
+      tftEloId: {
         [Op.gte]: 2000,
       },
     },
@@ -19,8 +20,16 @@ export const ingestDataForHighElo = async () => {
       continue;
     }
 
-    for await (const match of matches) {
-      await insertDataForMatch(match);
-    }
+    // for await (const match of matches) {
+    //   await insertDataForMatch(match);
+    //   await sleep(10000);
+    // }
+
+    await Promise.all(
+      matches.map(async (matchId) => {
+        await insertDataForMatch(matchId);
+        return;
+      })
+    );
   }
 };

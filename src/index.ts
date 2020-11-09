@@ -13,8 +13,9 @@ export const main = async (): Promise<void> => {
     await addKeysToRedis();
     await initialiseSummoners();
     await fetchMatches();
-
-    await ingestDataForHighElo();
+    while (true) {
+      await ingestDataForHighElo();
+    }
   } catch (e) {
     const logger = createLogger();
     logger.error(e);

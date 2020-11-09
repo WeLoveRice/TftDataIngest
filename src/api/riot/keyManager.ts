@@ -20,21 +20,21 @@ export const addKeysToRedis = async () => {
 };
 
 export const getKey = async () => {
-  const redis = await Redis.getConnection();
+  const logger = createLogger();
+  const redis = await Redis.connect();
   const [redisKey, apiKey] = await redis.blpop(REDIS_RIOT_KEYS, 0);
 
-  if (await redis.get(apiKey)) {
-    await sleep(1200);
-  }
-  if (!apiKey) {
-    throw new Error("Timeout waiting for key");
-  }
-
+  logger.info(`got key ${apiKey}`);
+  await redis.quit();
   return apiKey;
 };
 
 export const releaseKey = async (key: string) => {
-  await sleep(1200);
-  const redis = await Redis.getConnection();
-  await redis.rpush(REDIS_RIOT_KEYS, key);
+  const logger = createLogger();
+  logger.info(`releasing key ${key}`);
+  setTimeout(async () => {
+    const redis = await Redis.connect();
+    await redis.rpush(REDIS_RIOT_KEYS, key);
+    await redis.quit();
+  }, 1200);
 };

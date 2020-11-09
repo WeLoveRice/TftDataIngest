@@ -8,15 +8,10 @@ export class Redis {
     const logger = createLogger();
     const client = new IORedis(6379, "redis");
 
-    client.on("ready", async () => {
-      logger.info("Connected to redis");
-    });
-
     client.on("error", (error) => {
       logger.error(`redis error: ${error}`);
     });
 
-    await client.flushall();
     return client;
   };
 

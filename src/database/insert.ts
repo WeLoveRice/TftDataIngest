@@ -81,13 +81,17 @@ export const insertDataForMatchAndSummoner = async (
 
 export const insertDataForMatch = async (matchId: string): Promise<void> => {
   const logger = createLogger();
-  logger.info(`Match ${matchId}`);
-
   const [tftApi, apiKey] = await getTftApi();
 
   logger.info(`Match ${matchId} | Using key: ${apiKey}`);
   const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
-
+  if (!match.response.info.game_version.startsWith("Version 10.22")) {
+    logger.info(
+      `Skipping match id: ${match.response.metadata.match_id} as old version | ${match.response.info.game_version}`
+    );
+    await releaseKey(apiKey);
+    return;
+  }
   if (match.response.info.queue_id != Queue.RANKED_TFT) {
     logger.info(
       `Skipping match id: ${match.response.metadata.match_id} as not ranked`
@@ -118,7 +122,9 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
     if (!(await hasSummonerRank(summoner))) {
       await insertSummonerElo(summoner, apiKey, transaction);
     }
-
+    logger.info(
+      `Inserting participant info name: ${summoner?.summonerName} | ${participantDto.puuid}`
+    );
     await insertParticipantData(
       participantDto,
       match.response,
