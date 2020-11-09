@@ -27,6 +27,12 @@ export class Postgres {
       host: POSTGRES_HOST,
       dialect: "postgres",
       logging: (msg) => logger.info(msg),
+      pool: {
+        min: 0,
+        max: 10,
+        acquire: 60000,
+        idle: 10000,
+      },
     });
   }
   static async getSequelize() {

@@ -46,7 +46,7 @@ export const fetchMatches = async () => {
     const matchFetcher = new TftSummonerMatchFetcher(summonerName);
 
     await matchFetcher.execute();
-
+    await sleep(1000);
     setInterval(async () => {
       await matchFetcher.execute();
     }, 10 * 60 * 1000);

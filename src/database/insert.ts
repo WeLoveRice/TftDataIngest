@@ -18,7 +18,7 @@ import {
 } from "../api/riot/riot";
 import { Queue } from "../enum/Queue";
 import { createLogger } from "../Logger";
-import { upsertMatch } from "./insert/match";
+import { findOrCreateMatchByDto } from "./insert/match";
 import { insertParticipant } from "./insert/participant";
 import { insertParticipantElo } from "./insert/participantElo";
 import { insertParticipantLink } from "./insert/participantLink";
@@ -51,9 +51,7 @@ export const insertDataForMatchAndSummoner = async (
   const [tftApi, apiKey] = await getTftApi();
   const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
 
-  if (!(await doesMatchExist(match))) {
-    await upsertMatch(match);
-  }
+  await findOrCreateMatchByDto(match.response);
   const tftSummonerApiKey = await findOrCreateTftSummonerApiKey(
     summoner,
     apiKey
@@ -85,9 +83,7 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
 
   logger.info(`Match ${matchId} | Using key: ${apiKey}`);
   const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
-  if (!(await doesMatchExist(match))) {
-    await upsertMatch(match);
-  }
+  await findOrCreateMatchByDto(match.response);
 
   if (!match.response.info.game_version.startsWith("Version 10.22")) {
     logger.info(
@@ -110,8 +106,9 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
 const processParticipants = async (match: MatchTFTDTO, apiKey: string) => {
   const logger = createLogger();
   const matchId = match.metadata.match_id;
+  const transaction = await Postgres.newTransaction();
+
   for await (const participantDto of match.info.participants) {
-    const transaction = await Postgres.newTransaction();
     const summoner = await initSummonerByApiKey(
       participantDto.puuid,
       apiKey,
@@ -131,8 +128,8 @@ const processParticipants = async (match: MatchTFTDTO, apiKey: string) => {
       `Inserting participant info name: ${summoner?.summonerName} | ${participantDto.puuid}`
     );
     await insertParticipantData(participantDto, match, summoner, transaction);
-    await transaction.commit();
   }
+  await transaction.commit();
 };
 const hasParticipantBeenProcessed = async (
   matchId: string,
