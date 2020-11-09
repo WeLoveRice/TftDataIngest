@@ -12,7 +12,7 @@ export const ingestDataForHighElo = async () => {
   const summonerElos = await TftSummonerElo.findAll({
     where: {
       tftEloId: {
-        [Op.gte]: 2000,
+        [Op.gte]: 2500,
       },
     },
     order: [["tft_elo_id", "DESC"]],
@@ -22,7 +22,7 @@ export const ingestDataForHighElo = async () => {
 
   for await (const summonerElo of summonerElos) {
     const summoner = await TftSummoner.findByPk(summonerElo.tftSummonerId);
-    const matches = await fetchUniqueRecentMatches(summoner);
+    const matches = await fetchRecentUnprocessedMatches(summoner);
     if (matches.length === 0) {
       continue;
     }
@@ -46,21 +46,4 @@ export const ingestDataForHighElo = async () => {
       })
     );
   }
-};
-
-export const fetchUniqueRecentMatches = async (summoner: TftSummoner) => {
-  const matches = await fetchRecentUnprocessedMatches(summoner);
-  if (!matches) {
-    return [];
-  }
-
-  const tftMatches = await TftMatch.findAll({
-    where: {
-      tftMatchId: {
-        [Op.in]: matches,
-      },
-    },
-  });
-  const matchesInDb = tftMatches.map((match) => match.tftMatchId);
-  return matches.filter((matchId) => !matchesInDb.includes(matchId));
 };
