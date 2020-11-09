@@ -5,7 +5,7 @@ import { createLogger } from "../Logger";
 export class Postgres {
   static sequelize: Sequelize;
 
-  static async getSequelize() {
+  static async newConnection() {
     const logger = createLogger("POSTGRES");
 
     const {
@@ -23,20 +23,18 @@ export class Postgres {
       throw new Error("POSTGRES env not set");
     }
 
+    return new Sequelize(POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, {
+      host: POSTGRES_HOST,
+      dialect: "postgres",
+      logging: (msg) => logger.info(msg),
+    });
+  }
+  static async getSequelize() {
     if (Postgres.sequelize) {
       return Postgres.sequelize;
     }
 
-    Postgres.sequelize = new Sequelize(
-      POSTGRES_DB,
-      POSTGRES_USER,
-      POSTGRES_PASSWORD,
-      {
-        host: POSTGRES_HOST,
-        dialect: "postgres",
-        logging: (msg) => logger.info(msg),
-      }
-    );
+    Postgres.sequelize = await Postgres.newConnection();
     await Postgres.sequelize.authenticate();
     await Postgres.sequelize.sync();
     await initModels(Postgres.sequelize);

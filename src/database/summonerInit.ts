@@ -69,7 +69,7 @@ export const initSummonerByApiKey = async (
     transaction,
   });
 
-  await TftSummonerApiKey.create(
+  await TftSummonerApiKey.upsert(
     {
       tftSummonerId: tftSummoner?.tftSummonerId,
       tftApiKeyId: tftApiKey?.tftApiKeyId,
