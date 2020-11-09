@@ -2,7 +2,7 @@ import { Transaction } from "sequelize";
 import { ApiResponseDTO, MatchTFTDTO } from "twisted/dist/models-dto";
 import { TftMatch } from "../../../models/TftMatch";
 
-export const insertMatch = async ({
+export const upsertMatch = async ({
   response,
 }: ApiResponseDTO<MatchTFTDTO>): Promise<TftMatch> => {
   const {

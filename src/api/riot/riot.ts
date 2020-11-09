@@ -56,26 +56,13 @@ export const getMatchDetail = async (
 
 export const getParticipantFromMatch = async (
   match: ApiResponseDTO<MatchTFTDTO>,
-  summoner: TftSummoner
-): Promise<[ParticipantDto, TftSummonerApiKey]> => {
-  const tftSummonerApiKeys = await TftSummonerApiKey.findAll({
-    where: {
-      tftSummonerId: summoner.tftSummonerId,
-    },
-  });
-
-  for (const summonerApikey of tftSummonerApiKeys) {
-    const participantIndex = match.response.metadata.participants.findIndex(
-      (id) => id == summonerApikey.encryptedPlayerUuid
-    );
-    if (participantIndex != -1) {
-      const participant = match.response.info.participants[participantIndex];
-      return [participant, summonerApikey];
-    }
-  }
-  throw new Error(
-    `Could not find participant. MatchId: ${match.response.metadata.match_id} | summoner_name: ${summoner.summonerName}`
+  tftSummonerApiKey: TftSummonerApiKey
+): Promise<ParticipantDto> => {
+  const participantIndex = match.response.metadata.participants.findIndex(
+    (id) => id == tftSummonerApiKey.encryptedPlayerUuid
   );
+
+  return match.response.info.participants[participantIndex];
 };
 
 export const fetchLeagueBySummonerApiKey = async (

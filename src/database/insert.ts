@@ -1,5 +1,6 @@
 import { Regions, TftRegions } from "twisted/dist/constants";
 import {
+  TftApiKey,
   TftElo,
   TftParticipantLink,
   TftSummonerApiKey,
@@ -15,7 +16,7 @@ import {
 } from "../api/riot/riot";
 import { Queue } from "../enum/Queue";
 import { createLogger } from "../Logger";
-import { insertMatch } from "./insert/match";
+import { upsertMatch } from "./insert/match";
 import { insertParticipant } from "./insert/participant";
 import { insertParticipantElo } from "./insert/participantElo";
 import { insertParticipantLink } from "./insert/participantLink";
@@ -23,20 +24,26 @@ import { insertParticipantTrait } from "./insert/participantTrait";
 import { insertParticipantUnit } from "./insert/participantUnit";
 import { insertParticipantUnitItem } from "./insert/participantUnitItem";
 import { insertSummonerElo } from "./insert/summonerElo";
-import { matchExists } from "./search";
+import { findOrCreateTftSummonerApiKey, matchExists } from "./search";
 import { initSummonerByApiKey } from "./summonerInit";
 
 export const insertDataForMatchAndSummoner = async (
   matchId: string,
   summoner: TftSummoner
 ): Promise<void> => {
-  const match = await getMatchDetail(matchId);
+  const [tftApi, apiKey] = await getTftApi();
+  const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
+
   if (!(await matchExists(match))) {
-    await insertMatch(match);
+    await upsertMatch(match);
   }
-  const [participantDto, tftSummonerApiKey] = await getParticipantFromMatch(
+  const tftSummonerApiKey = await findOrCreateTftSummonerApiKey(
+    summoner,
+    apiKey
+  );
+  const participantDto = await getParticipantFromMatch(
     match,
-    summoner
+    tftSummonerApiKey
   );
 
   const transaction = await Postgres.newTransaction();
@@ -73,7 +80,7 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
   }
 
   if (!(await matchExists(match))) {
-    await insertMatch(match);
+    await upsertMatch(match);
   }
 
   for await (const participantDto of match.response.info.participants) {
