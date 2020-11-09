@@ -1,4 +1,6 @@
+import { Transaction } from "sequelize/types";
 import { Regions, TftRegions } from "twisted/dist/constants";
+import { MatchTFTDTO, ParticipantDto } from "twisted/dist/models-dto";
 import {
   TftApiKey,
   TftElo,
@@ -27,6 +29,21 @@ import { insertSummonerElo } from "./insert/summonerElo";
 import { findOrCreateTftSummonerApiKey, matchExists } from "./search";
 import { initSummonerByApiKey } from "./summonerInit";
 
+const insertParticipantData = async (
+  participantDto: ParticipantDto,
+  match: MatchTFTDTO,
+  summoner: TftSummoner,
+  transaction: Transaction
+) => {
+  const participant = await insertParticipant(participantDto, transaction);
+  await insertParticipantLink(match, participant, summoner, transaction);
+  await insertParticipantUnit(participant, participantDto, transaction);
+  await insertParticipantUnitItem(participant, participantDto, transaction);
+  await insertParticipantTrait(participant, participantDto, transaction);
+
+  return participant;
+};
+
 export const insertDataForMatchAndSummoner = async (
   matchId: string,
   summoner: TftSummoner
@@ -47,17 +64,17 @@ export const insertDataForMatchAndSummoner = async (
   );
 
   const transaction = await Postgres.newTransaction();
-  const participant = await insertParticipant(participantDto, transaction);
 
+  const participant = await insertParticipantData(
+    participantDto,
+    match.response,
+    summoner,
+    transaction
+  );
   // Only check rank if game was ranked
   if (match.response.info.queue_id == Queue.RANKED_TFT) {
     await insertParticipantElo(participant, tftSummonerApiKey, transaction);
   }
-
-  await insertParticipantLink(match, participant, summoner, transaction);
-  await insertParticipantUnit(participant, participantDto.units, transaction);
-  await insertParticipantUnitItem(participant, participantDto, transaction);
-  await insertParticipantTrait(participant, participantDto, transaction);
 
   await transaction.commit();
 };
@@ -98,16 +115,16 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
       await transaction.commit();
       continue;
     }
-
-    const participant = await insertParticipant(participantDto, transaction);
-
     if (!(await hasSummonerRank(summoner))) {
       await insertSummonerElo(summoner, apiKey, transaction);
     }
-    await insertParticipantLink(match, participant, summoner, transaction);
-    await insertParticipantUnit(participant, participantDto.units, transaction);
-    await insertParticipantUnitItem(participant, participantDto, transaction);
-    await insertParticipantTrait(participant, participantDto, transaction);
+
+    await insertParticipantData(
+      participantDto,
+      match.response,
+      summoner,
+      transaction
+    );
     await transaction.commit();
   }
   await releaseKey(apiKey);

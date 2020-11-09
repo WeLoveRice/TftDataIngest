@@ -7,14 +7,14 @@ import {
 } from "../../../models/init-models";
 
 export const insertParticipantLink = async (
-  { response }: ApiResponseDTO<MatchTFTDTO>,
+  match: MatchTFTDTO,
   participant: TftParticipant,
   summoner: TftSummoner,
   transaction: Transaction
 ): Promise<TftParticipantLink> => {
   return TftParticipantLink.create(
     {
-      tftMatchId: response.metadata.match_id,
+      tftMatchId: match.metadata.match_id,
       tftParticipantId: participant.tftParticipantId,
       tftSummonerId: summoner.tftSummonerId,
     },
