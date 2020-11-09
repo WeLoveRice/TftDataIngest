@@ -75,7 +75,7 @@ export const insertDataForMatchAndSummoner = async (
   if (match.response.info.queue_id == Queue.RANKED_TFT) {
     await insertParticipantElo(participant, tftSummonerApiKey, transaction);
   }
-
+  await releaseKey(apiKey);
   await transaction.commit();
 };
 
