@@ -21,6 +21,7 @@
   "dependencies": {
     "fs-extra": "^9.0.1",
     "ioredis": "^4.19.2",
+    "moment": "^2.29.1",
     "pg": "^8.4.2",
     "sequelize": "^6.3.5",
     "sleep-promise": "^9.0.0",

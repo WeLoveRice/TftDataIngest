@@ -22,7 +22,7 @@ export const findSummonerByName = async (
   return summoner;
 };
 
-export const matchExists = async ({
+export const doesMatchExist = async ({
   response,
 }: ApiResponseDTO<MatchTFTDTO>): Promise<boolean> => {
   const result = await TftMatch.count({

@@ -26,7 +26,7 @@ import { insertParticipantTrait } from "./insert/participantTrait";
 import { insertParticipantUnit } from "./insert/participantUnit";
 import { insertParticipantUnitItem } from "./insert/participantUnitItem";
 import { insertSummonerElo } from "./insert/summonerElo";
-import { findOrCreateTftSummonerApiKey, matchExists } from "./search";
+import { findOrCreateTftSummonerApiKey, doesMatchExist } from "./search";
 import { initSummonerByApiKey } from "./summonerInit";
 
 const insertParticipantData = async (
@@ -51,7 +51,7 @@ export const insertDataForMatchAndSummoner = async (
   const [tftApi, apiKey] = await getTftApi();
   const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
 
-  if (!(await matchExists(match))) {
+  if (!(await doesMatchExist(match))) {
     await upsertMatch(match);
   }
   const tftSummonerApiKey = await findOrCreateTftSummonerApiKey(
@@ -85,26 +85,32 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
 
   logger.info(`Match ${matchId} | Using key: ${apiKey}`);
   const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
+  if (!(await doesMatchExist(match))) {
+    await upsertMatch(match);
+  }
+
   if (!match.response.info.game_version.startsWith("Version 10.22")) {
     logger.info(
-      `Skipping match id: ${match.response.metadata.match_id} as old version | ${match.response.info.game_version}`
+      `Not processing participants match id: ${match.response.metadata.match_id} as old version | ${match.response.info.game_version}`
     );
     await releaseKey(apiKey);
     return;
   }
   if (match.response.info.queue_id != Queue.RANKED_TFT) {
     logger.info(
-      `Skipping match id: ${match.response.metadata.match_id} as not ranked`
+      `Not processing participants | match id: ${match.response.metadata.match_id} as not ranked`
     );
     await releaseKey(apiKey);
     return;
   }
+  await processParticipants(match.response, apiKey);
+  await releaseKey(apiKey);
+};
 
-  if (!(await matchExists(match))) {
-    await upsertMatch(match);
-  }
-
-  for await (const participantDto of match.response.info.participants) {
+const processParticipants = async (match: MatchTFTDTO, apiKey: string) => {
+  const logger = createLogger();
+  const matchId = match.metadata.match_id;
+  for await (const participantDto of match.info.participants) {
     const transaction = await Postgres.newTransaction();
     const summoner = await initSummonerByApiKey(
       participantDto.puuid,
@@ -112,49 +118,47 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
       transaction
     );
 
-    if (await hasParticipantBeenProcessed(matchId, summoner)) {
+    if (await hasParticipantBeenProcessed(matchId, summoner, transaction)) {
       logger.info(
         `Already processed participant. match id: ${matchId} | summoner id: ${summoner?.tftSummonerId}`
       );
-      await transaction.commit();
       continue;
     }
-    if (!(await hasSummonerRank(summoner))) {
+    if (!(await hasSummonerRank(summoner, transaction))) {
       await insertSummonerElo(summoner, apiKey, transaction);
     }
     logger.info(
       `Inserting participant info name: ${summoner?.summonerName} | ${participantDto.puuid}`
     );
-    await insertParticipantData(
-      participantDto,
-      match.response,
-      summoner,
-      transaction
-    );
+    await insertParticipantData(participantDto, match, summoner, transaction);
     await transaction.commit();
   }
-  await releaseKey(apiKey);
 };
-
 const hasParticipantBeenProcessed = async (
   matchId: string,
-  summoner: TftSummoner
+  summoner: TftSummoner,
+  transaction: Transaction
 ) => {
   const count = await TftParticipantLink.count({
     where: {
       tftMatchId: matchId,
       tftSummonerId: summoner?.tftSummonerId,
     },
+    transaction,
   });
 
   return count > 0;
 };
 
-const hasSummonerRank = async (summoner: TftSummoner) => {
+const hasSummonerRank = async (
+  summoner: TftSummoner,
+  transaction: Transaction
+) => {
   const count = await TftSummonerElo.count({
     where: {
       tftSummonerId: summoner?.tftSummonerId,
     },
+    transaction,
   });
 
   return count > 0;

@@ -1,3 +1,4 @@
+import sleep from "sleep-promise";
 import { TftApi, Constants } from "twisted";
 import { Regions } from "twisted/dist/constants";
 import {
@@ -72,7 +73,7 @@ export const fetchLeagueBySummonerApiKey = async (
 
   const redis = await Redis.getConnection();
   await redis.psetex(tftApiKey?.riotApiKey, 1200, true);
-
+  await sleep(600);
   const tftApi = new TftApi(tftApiKey?.riotApiKey);
   return tftApi.League.get(summonerApiKey.encryptedSummonerId, Regions.EU_WEST);
 };
