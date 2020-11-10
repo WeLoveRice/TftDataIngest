@@ -1,7 +1,11 @@
 import { Op } from "sequelize";
 import { Constants } from "twisted";
 import { Regions, TftRegions } from "twisted/dist/constants";
-import { TftParticipantLink, TftSummoner } from "../../models/init-models";
+import {
+  TftMatch,
+  TftParticipantLink,
+  TftSummoner,
+} from "../../models/init-models";
 import { TftApiKey } from "../../models/TftApiKey";
 import { TftSummonerApiKey } from "../../models/TftSummonerApiKey";
 import { releaseKey } from "../api/riot/keyManager";
@@ -54,15 +58,15 @@ export const fetchRecentUnprocessedMatches = async (
   summoner: TftSummoner
 ): Promise<string[]> => {
   const { response } = await fetchMatchListBySummoner(summoner);
-  const links = await TftParticipantLink.findAll({
+  // Use match and not links, as if we've seen a match before we don't care if there are participants for now
+  const matches = await TftMatch.findAll({
     where: {
-      tftSummonerId: summoner.tftSummonerId,
       tftMatchId: {
         [Op.in]: response,
       },
     },
   });
 
-  const matchIdsInDb = links.map((link) => link.tftMatchId);
+  const matchIdsInDb = matches.map((match) => match.tftMatchId);
   return response.filter((matchId) => !matchIdsInDb.includes(matchId));
 };

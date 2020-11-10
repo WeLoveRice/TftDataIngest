@@ -83,8 +83,9 @@ export const insertDataForMatch = async (matchId: string): Promise<void> => {
 
   logger.info(`Match ${matchId} | Using key: ${apiKey}`);
   const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
-  await findOrCreateMatchByDto(match.response);
+  const [tftMatch, created] = await findOrCreateMatchByDto(match.response);
 
+  logger.info(`Match Id: ${tftMatch.tftMatchId} - created: ${created}`);
   if (!match.response.info.game_version.startsWith("Version 10.22")) {
     logger.info(
       `Not processing participants match id: ${match.response.metadata.match_id} as old version | ${match.response.info.game_version}`

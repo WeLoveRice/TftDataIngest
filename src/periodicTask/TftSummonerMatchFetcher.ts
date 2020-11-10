@@ -24,15 +24,22 @@ export class TftSummonerMatchFetcher {
   }
 
   async execute(): Promise<void> {
-    this.logger.info(`Periodic check for ${this.summonerName}`);
-    await this.getSummoner();
-    const matchId = await fetchLatestUnprocessedMatchId(this.summoner);
+    try {
+      this.logger.info(`Periodic check for ${this.summonerName}`);
+      await this.getSummoner();
 
-    if (!matchId) {
-      return;
+      const matchId = await fetchLatestUnprocessedMatchId(this.summoner);
+
+      if (!matchId) {
+        return;
+      }
+
+      await insertDataForMatchAndSummoner(matchId, this.summoner);
+    } catch (error) {
+      console.log(
+        `Error fetching periodically for summoner: ${this.summoner.summonerName} - ${error}`
+      );
     }
-
-    await insertDataForMatchAndSummoner(matchId, this.summoner);
   }
 }
 

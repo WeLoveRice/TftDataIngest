@@ -9,21 +9,35 @@ import { fetchRecentUnprocessedMatches } from "../database/matchFinder";
 import { createLogger } from "../Logger";
 
 export const ingestDataForHighElo = async () => {
+  await TftSummonerElo.hasOne(TftSummoner, {
+    sourceKey: "tftSummonerId",
+    foreignKey: "tftSummonerId",
+    as: "tftSummoner",
+  });
   const summonerElos = await TftSummonerElo.findAll({
     where: {
       tftEloId: {
-        [Op.gte]: 2500,
+        [Op.gte]: 2200,
       },
     },
-    order: [["tft_elo_id", "DESC"]],
+    include: [TftSummonerElo.associations.tftSummoner],
+    order: [["tft_elo_id", "ASC"]],
   });
   const logger = createLogger();
   const badMatches = ["EUW1_4894806985"];
 
   for await (const summonerElo of summonerElos) {
-    const summoner = await TftSummoner.findByPk(summonerElo.tftSummonerId);
-    const matches = await fetchRecentUnprocessedMatches(summoner);
-    if (matches.length === 0) {
+    const summoner = summonerElo.tftSummoner;
+    let matches = [];
+    try {
+      matches = await fetchRecentUnprocessedMatches(summoner);
+      if (matches.length === 0) {
+        continue;
+      }
+    } catch (error) {
+      console.log(
+        `Error fetching matches for summoner: ${summoner?.summonerName} - ${error}`
+      );
       continue;
     }
 
@@ -42,7 +56,11 @@ export const ingestDataForHighElo = async () => {
         if (badMatches.includes(match)) {
           return;
         }
-        await insertDataForMatch(match);
+        try {
+          await insertDataForMatch(match);
+        } catch (error) {
+          console.log(`Error for Match id: ${match} - ${error}`);
+        }
       })
     );
   }
