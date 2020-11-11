@@ -9,15 +9,10 @@ import { fetchRecentUnprocessedMatches } from "../database/matchFinder";
 import { createLogger } from "../Logger";
 
 export const ingestDataForHighElo = async () => {
-  await TftSummonerElo.hasOne(TftSummoner, {
-    sourceKey: "tftSummonerId",
-    foreignKey: "tftSummonerId",
-    as: "tftSummoner",
-  });
   const summonerElos = await TftSummonerElo.findAll({
     where: {
       tftEloId: {
-        [Op.gte]: 2200,
+        [Op.gte]: 2000,
       },
     },
     include: [TftSummonerElo.associations.tftSummoner],

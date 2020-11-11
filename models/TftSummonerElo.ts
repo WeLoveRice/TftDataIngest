@@ -82,6 +82,12 @@ export class TftSummonerElo
         ],
       }
     );
+
+    TftSummonerElo.hasOne(TftSummoner, {
+      sourceKey: "tftSummonerId",
+      foreignKey: "tftSummonerId",
+      as: "tftSummoner",
+    });
     return TftSummonerElo;
   }
 }
