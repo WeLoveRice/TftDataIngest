@@ -11,9 +11,10 @@ RUN npm install
 COPY --chown=node:node . .
 RUN npm run build
 RUN npm prune --production
+COPY riot-api-keys.txt build
 
 ### Production image
-FROM node:12-alpine
+FROM node:12-alpine as prod
 
 WORKDIR /home/node/tft-match-fetcher
 USER node
