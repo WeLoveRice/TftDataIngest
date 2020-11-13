@@ -14,6 +14,7 @@ import { Postgres } from "../api/postgres";
 import { releaseKey } from "../api/riot/keyManager";
 import { getSummoner, getTftApi } from "../api/riot/riot";
 import { Op } from "sequelize";
+
 export const ingestHighEloLeagues = async () => {
   const [tftApi, key] = await getTftApi();
   const masterLeague = await tftApi.League.getMasterLeague(Regions.EU_WEST);
