@@ -4,7 +4,7 @@ import {
   TftSummoner,
   TftSummonerElo,
 } from "../../models/init-models";
-import { insertDataForMatch } from "../database/insert";
+import { insertDataForMatch } from "../database/insert/tft/tftMatch";
 import { fetchRecentUnprocessedMatches } from "../database/matchFinder";
 import { createLogger } from "../Logger";
 
@@ -39,13 +39,6 @@ export const ingestDataForHighElo = async () => {
     await logger.info(
       `Processing matches: ${matches} | summoner ${summoner?.summonerName}`
     );
-    // for await (const match of matches) {
-    //   try {
-    //     await insertDataForMatch(match);
-    //   } catch (error) {
-    //     logger.error(`Error processing match ${match} - ${error}`);
-    //   }
-    // }
     await Promise.all(
       matches.map(async (match) => {
         if (badMatches.includes(match)) {

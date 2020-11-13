@@ -2,9 +2,9 @@ import sleep from "sleep-promise";
 import { Logger } from "winston";
 import { TftSummoner } from "../../models/init-models";
 import { createLogger } from "../Logger";
-import { insertDataForMatchAndSummoner } from "../database/insert";
 import { findSummonerByName } from "../database/search";
 import { fetchLatestUnprocessedMatchId } from "../database/matchFinder";
+import { insertDataForMatchAndSummoner } from "../database/insert/tft/tftMatchSummoner";
 
 export class TftSummonerMatchFetcher {
   summonerName: string;
@@ -39,6 +39,7 @@ export class TftSummonerMatchFetcher {
       console.log(
         `Error fetching periodically for summoner: ${this.summoner.summonerName} - ${error}`
       );
+      this.logger.error(error);
     }
   }
 }
