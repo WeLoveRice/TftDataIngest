@@ -12,7 +12,7 @@ import { TftApiKey } from "../../../models/TftApiKey";
 import { TftSummoner } from "../../../models/TftSummoner";
 import { TftSummonerApiKey } from "../../../models/TftSummonerApiKey";
 import { Redis } from "../redis";
-import { getKey, releaseKey } from "./keyManager";
+import { getKey, getSpecificKey, releaseKey } from "./keyManager";
 
 export const getTftApi = async (): Promise<[TftApi, string]> => {
   const key = await getKey();
@@ -69,11 +69,14 @@ export const getParticipantFromMatch = async (
 export const fetchLeagueBySummonerApiKey = async (
   summonerApiKey: TftSummonerApiKey
 ): Promise<ApiResponseDTO<LeagueEntryDTO[]>> => {
-  const tftApiKey = await TftApiKey.findByPk(summonerApiKey.tftApiKeyId);
+  const { riotApiKey } = await TftApiKey.findByPk(summonerApiKey.tftApiKeyId);
 
-  const redis = await Redis.getConnection();
-  await redis.psetex(tftApiKey?.riotApiKey, 1200, true);
-  await sleep(600);
-  const tftApi = new TftApi(tftApiKey?.riotApiKey);
-  return tftApi.League.get(summonerApiKey.encryptedSummonerId, Regions.EU_WEST);
+  await getSpecificKey(riotApiKey);
+  const tftApi = new TftApi(riotApiKey);
+  const league = tftApi.League.get(
+    summonerApiKey.encryptedSummonerId,
+    Regions.EU_WEST
+  );
+  await releaseKey(riotApiKey);
+  return league;
 };

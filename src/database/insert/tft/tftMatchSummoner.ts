@@ -15,6 +15,7 @@ export const insertDataForMatchAndSummoner = async (
 ): Promise<void> => {
   const [tftApi, apiKey] = await getTftApi();
   const match = await tftApi.Match.get(matchId, TftRegions.EUROPE);
+  await releaseKey(apiKey);
 
   await findOrCreateMatchByDto(match.response);
   const tftSummonerApiKey = await findOrCreateTftSummonerApiKey(
@@ -38,6 +39,5 @@ export const insertDataForMatchAndSummoner = async (
   if (match.response.info.queue_id == Queue.RANKED_TFT) {
     await insertParticipantElo(participant, tftSummonerApiKey, transaction);
   }
-  await releaseKey(apiKey);
   await transaction.commit();
 };

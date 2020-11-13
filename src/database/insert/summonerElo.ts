@@ -1,5 +1,4 @@
 import { Transaction } from "sequelize/types";
-import sleep from "sleep-promise";
 import { TftApi } from "twisted";
 import { Regions } from "twisted/dist/constants";
 import {
@@ -9,33 +8,21 @@ import {
   TftSummonerApiKey,
   TftSummonerElo,
 } from "../../../models/init-models";
+import { getSpecificKey, releaseKey } from "../../api/riot/keyManager";
 
 export const insertSummonerElo = async (
   summoner: TftSummoner,
-  apiKey: string,
+  { riotApiKey }: TftApiKey,
+  tftSummonerApiKey: TftSummonerApiKey,
   transaction: Transaction
 ) => {
-  const tftApiKey = await TftApiKey.findOne({
-    where: {
-      riotApiKey: apiKey,
-    },
-    transaction,
-  });
-
-  const tftSummonerApiKey = await TftSummonerApiKey.findOne({
-    where: {
-      tftSummonerId: summoner?.tftSummonerId,
-      tftApiKeyId: tftApiKey?.tftApiKeyId,
-    },
-    transaction,
-  });
-
-  const tftApi = new TftApi(apiKey);
+  await getSpecificKey(riotApiKey);
+  const tftApi = new TftApi(riotApiKey);
   const leagueDto = await tftApi.League.get(
-    tftSummonerApiKey?.encryptedSummonerId,
+    tftSummonerApiKey.encryptedSummonerId,
     Regions.EU_WEST
   );
-  await sleep(1200);
+  await releaseKey(riotApiKey);
 
   if (leagueDto.response.length === 0) {
     return;
