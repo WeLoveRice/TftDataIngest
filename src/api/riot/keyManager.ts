@@ -15,7 +15,7 @@ export const initKeys = async () => {
     await redis.rpush(key, key);
   }
   await redis.quit();
-  setInterval(async () => await keyTransfer(apiKeys), 1000);
+  setInterval(async () => await keyTransfer(apiKeys), 500);
 };
 
 const keyTransfer = async (keys: string[]) => {
