@@ -6,12 +6,18 @@ export interface IndexMatchesAttributes {
   matchId?: string;
   set?: number;
   queueId?: number;
+  date?: Date;
+  dataVer?: string;
+  gameVersion?: string;
 }
 
 export class IndexMatches extends Model<IndexMatchesAttributes, IndexMatchesAttributes> implements IndexMatchesAttributes {
   matchId?: string;
   set?: number;
   queueId?: number;
+  date?: Date;
+  dataVer?: string;
+  gameVersion?: string;
 
   static initModel(sequelize: Sequelize) {
     IndexMatches.init({
@@ -22,13 +28,27 @@ export class IndexMatches extends Model<IndexMatchesAttributes, IndexMatchesAttr
       field: 'match_id'
     },
     set: {
-      type: DataTypes.DOUBLE,
+      type: DataTypes.INTEGER,
       allowNull: true
     },
     queueId: {
-      type: DataTypes.DOUBLE,
+      type: DataTypes.INTEGER,
       allowNull: true,
       field: 'queue_id'
+    },
+    date: {
+      type: DataTypes.DATE,
+      allowNull: true
+    },
+    dataVer: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'data_ver'
+    },
+    gameVersion: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+      field: 'game_version'
     }
   }, {
     sequelize,

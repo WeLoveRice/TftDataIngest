@@ -4,10 +4,9 @@ import { createLogger } from "../Logger";
 
 export class Postgres {
   static sequelize: Sequelize;
-  static transaciton: Transaction;
 
-  static async getSequelize() {
-    const logger = createLogger();
+  static async newConnection() {
+    const logger = createLogger("POSTGRES");
 
     const {
       POSTGRES_HOST,
@@ -24,20 +23,24 @@ export class Postgres {
       throw new Error("POSTGRES env not set");
     }
 
+    return new Sequelize(POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD, {
+      host: POSTGRES_HOST,
+      dialect: "postgres",
+      logging: (msg) => logger.info(msg),
+      pool: {
+        min: 0,
+        max: 20,
+        acquire: 60000,
+        idle: 10000,
+      },
+    });
+  }
+  static async getSequelize() {
     if (Postgres.sequelize) {
       return Postgres.sequelize;
     }
 
-    Postgres.sequelize = new Sequelize(
-      POSTGRES_DB,
-      POSTGRES_USER,
-      POSTGRES_PASSWORD,
-      {
-        host: POSTGRES_HOST,
-        dialect: "postgres",
-        logging: (msg) => logger.info(msg),
-      }
-    );
+    Postgres.sequelize = await Postgres.newConnection();
     await Postgres.sequelize.authenticate();
     await Postgres.sequelize.sync();
     await initModels(Postgres.sequelize);
@@ -45,18 +48,8 @@ export class Postgres {
     return Postgres.sequelize;
   }
 
-  static async getTransaction() {
-    const sequelize = await Postgres.getSequelize();
-    if (Postgres.transaciton) {
-      return Postgres.transaciton;
-    }
-
-    Postgres.transaciton = await sequelize.transaction();
-    return Postgres.transaciton;
-  }
-
   static async newTransaction() {
     const sequelize = await Postgres.getSequelize();
-    Postgres.transaciton = await sequelize.transaction();
+    return sequelize.transaction();
   }
 }

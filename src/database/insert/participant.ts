@@ -1,19 +1,20 @@
+import { Transaction } from "sequelize";
 import { ParticipantDto } from "twisted/dist/models-dto";
 import { TftParticipant } from "../../../models/init-models";
 import { Postgres } from "../../api/postgres";
 import { createLogger } from "../../Logger";
 
-export const insertParticipant = async ({
-  level,
-  gold_left,
-  placement,
-  last_round,
-  players_eliminated,
-  total_damage_to_players,
-}: ParticipantDto): Promise<TftParticipant> => {
-  const logger = createLogger();
-  const transaction = await Postgres.getTransaction();
-
+export const insertParticipant = async (
+  {
+    level,
+    gold_left,
+    placement,
+    last_round,
+    players_eliminated,
+    total_damage_to_players,
+  }: ParticipantDto,
+  transaction: Transaction
+): Promise<TftParticipant> => {
   const participant = await TftParticipant.create(
     {
       level,
@@ -25,8 +26,6 @@ export const insertParticipant = async ({
     },
     { transaction }
   );
-
-  logger.info(`Inserted participant with ID: ${participant.tftParticipantId}`);
 
   return participant;
 };

@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import { ParticipantDto } from "twisted/dist/models-dto";
 import {
   TftParticipant,
@@ -8,9 +9,9 @@ import { Postgres } from "../../api/postgres";
 
 export const insertParticipantTrait = async (
   participant: TftParticipant,
-  participantDto: ParticipantDto
+  participantDto: ParticipantDto,
+  transaction: Transaction
 ) => {
-  const transaction = await Postgres.getTransaction();
   for await (const traitDto of participantDto.traits) {
     const trait = await TftTrait.findOne({
       where: {

@@ -5,26 +5,19 @@ import { DataTypes, Model, Sequelize } from 'sequelize';
 export interface IndexSummonersAttributes {
   uuid?: string;
   summonerName?: string;
-  puuid?: string;
 }
 
 export class IndexSummoners extends Model<IndexSummonersAttributes, IndexSummonersAttributes> implements IndexSummonersAttributes {
   uuid?: string;
   summonerName?: string;
-  puuid?: string;
 
   static initModel(sequelize: Sequelize) {
     IndexSummoners.init({
     uuid: {
       type: DataTypes.TEXT,
-      allowNull: false,
-      primaryKey: true
-    },
-    summonerName: {
-      type: DataTypes.TEXT,
       allowNull: true
     },
-    puuid: {
+    summonerName: {
       type: DataTypes.TEXT,
       allowNull: true
     }
@@ -32,16 +25,7 @@ export class IndexSummoners extends Model<IndexSummonersAttributes, IndexSummone
     sequelize,
     tableName: 'index_summoners',
     schema: 'public',
-    timestamps: false,
-    indexes: [
-      {
-        name: "index_summoners_pkey",
-        unique: true,
-        fields: [
-          { name: "uuid" },
-        ]
-      },
-    ]
+    timestamps: false
   });
   return IndexSummoners;
   }

@@ -1,21 +1,28 @@
+import { Transaction } from "sequelize";
 import {
   TftElo,
   TftParticipant,
   TftParticipantElo,
   TftSummoner,
 } from "../../../models/init-models";
-import { Postgres } from "../../api/postgres";
-import { fetchLeagueBySummoner } from "../../api/riot";
+import { TftSummonerApiKey } from "../../../models/TftSummonerApiKey";
+import { fetchLeagueBySummonerApiKey } from "../../api/riot/riot";
 import { createLogger } from "../../Logger";
 
+// We need to be specific with which api key we used as we can only
+// fetch a summoner with their corresponding api key
 export const insertParticipantElo = async (
   participant: TftParticipant,
-  summoner: TftSummoner
+  tftSummonerApiKey: TftSummonerApiKey,
+  transaction: Transaction
 ) => {
-  const { response } = await fetchLeagueBySummoner(summoner);
+  const { response } = await fetchLeagueBySummonerApiKey(tftSummonerApiKey);
   if (response.length === 0) {
     const logger = createLogger();
-    logger.info(`${summoner.summonerName} does not have a rank`);
+    const summoner = await TftSummoner.findByPk(
+      tftSummonerApiKey.tftSummonerId
+    );
+    logger.info(`${summoner?.summonerName} does not have a rank`);
     return;
   }
   const { tier, rank, leaguePoints } = response[0];
@@ -27,8 +34,6 @@ export const insertParticipantElo = async (
       lp: leaguePoints,
     },
   });
-
-  const transaction = await Postgres.getTransaction();
 
   await TftParticipantElo.create(
     {

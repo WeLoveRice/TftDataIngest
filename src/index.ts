@@ -1,26 +1,21 @@
 import { createLogger } from "./Logger";
-import { fetchMatches } from "./periodicTask/TftMatchFetcher";
+import { addKeysToRedis } from "./api/riot/keyManager";
+import { fetchMatches } from "./periodicTask/TftSummonerMatchFetcher";
+import { initialiseSummoners } from "./database/summonerInit";
 import { Postgres } from "./api/postgres";
-import { initialiseSummoners } from "./database/SummonerInit";
-import path from "path";
-import fs from "fs";
-import { TftItem } from "../models/TftItem";
-import {
-  TftParticipantLink,
-  TftParticipantUnit,
-  TftSummoner,
-  TftUnit,
-} from "../models/init-models";
-import { getParticipantFromMatch, getTftApi } from "./api/riot";
-import { TftRegions } from "twisted/dist/constants";
-import { TftParticipantUnitItem } from "../models/TftParticipantUnitItem";
-import sleep from "sleep-promise";
+import { upsertApiKeys } from "./database/apiKeyInit";
+import { ingestDataForHighElo } from "./ingest/summonerMatches";
 
 export const main = async (): Promise<void> => {
   try {
     await Postgres.getSequelize();
+    await upsertApiKeys();
+    await addKeysToRedis();
     await initialiseSummoners();
     await fetchMatches();
+    while (true) {
+      await ingestDataForHighElo();
+    }
   } catch (e) {
     const logger = createLogger();
     logger.error(e);

@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/WeLoveRice/TftDataIngest#readme",
   "dependencies": {
+    "fs-extra": "^9.0.1",
+    "ioredis": "^4.19.2",
+    "moment": "^2.29.1",
     "pg": "^8.4.2",
     "sequelize": "^6.3.5",
     "sleep-promise": "^9.0.0",
@@ -27,6 +30,8 @@
     "winston-daily-rotate-file": "^4.5.0"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.3",
+    "@types/ioredis": "^4.17.7",
     "@types/request": "^2.48.5",
     "@types/validator": "^13.1.0",
     "@typescript-eslint/eslint-plugin": "^4.6.1",

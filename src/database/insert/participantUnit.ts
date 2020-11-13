@@ -1,4 +1,5 @@
-import { UnitDto } from "twisted/dist/models-dto";
+import { Transaction } from "sequelize";
+import { ParticipantDto, UnitDto } from "twisted/dist/models-dto";
 import {
   TftParticipant,
   TftParticipantUnit,
@@ -9,12 +10,12 @@ import { findTftUnitByDto } from "../search";
 
 export const insertParticipantUnit = async (
   participant: TftParticipant,
-  units: UnitDto[]
+  participantDto: ParticipantDto,
+  transaction: Transaction
 ) => {
-  for await (const unit of units) {
+  for await (const unit of participantDto.units) {
     const tftUnit = await findTftUnitByDto(unit);
 
-    const transaction = await Postgres.getTransaction();
     await TftParticipantUnit.create(
       {
         tftParticipantId: participant.tftParticipantId,

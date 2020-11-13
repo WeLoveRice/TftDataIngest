@@ -4,11 +4,14 @@ import path from "path";
 
 export const LOG_DIR = path.join(__dirname, "..", "logs");
 
-export const createLogger = (): Logger => {
+export const createLogger = (suffix = ""): Logger => {
   const { Console } = transports;
-
+  let filename = `${LOG_DIR}/%DATE%.log`;
+  if (suffix) {
+    filename = `${LOG_DIR}/%DATE% - ${suffix}.log`;
+  }
   const dailyRotate = new DailyRotateFile({
-    filename: `${LOG_DIR}/%DATE%.log`,
+    filename,
     datePattern: "YYYY-MM-DD",
     zippedArchive: true,
     maxSize: "20m",

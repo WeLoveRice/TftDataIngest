@@ -1,12 +1,13 @@
+import { Constants, TftApi } from "twisted";
+import { Regions } from "twisted/dist/constants";
 import { ApiResponseDTO, MatchTFTDTO, UnitDto } from "twisted/dist/models-dto";
 import {
-  TftParticipantLink,
+  TftApiKey,
   TftSummoner,
+  TftSummonerApiKey,
   TftUnit,
 } from "../../models/init-models";
 import { TftMatch } from "../../models/TftMatch";
-import { getMatchHistory } from "../api/riot";
-
 export const findSummonerByName = async (
   name: string
 ): Promise<TftSummoner> => {
@@ -21,26 +22,7 @@ export const findSummonerByName = async (
   return summoner;
 };
 
-export const fetchLatestUnprocessedMatchId = async (
-  summoner: TftSummoner
-): Promise<string | null> => {
-  const matches = await getMatchHistory(summoner.encryptedPlayerUuid);
-
-  const result = await TftParticipantLink.count({
-    where: {
-      tftSummonerId: summoner.tftSummonerId,
-      tftMatchId: matches.response[0],
-    },
-  });
-
-  if (result > 0) {
-    return null;
-  }
-
-  return matches.response[0];
-};
-
-export const matchExists = async ({
+export const doesMatchExist = async ({
   response,
 }: ApiResponseDTO<MatchTFTDTO>): Promise<boolean> => {
   const result = await TftMatch.count({
@@ -59,5 +41,39 @@ export const findTftUnitByDto = async (unit: UnitDto) => {
       tier: unit.tier,
       chosen: unit.chosen ? unit.chosen : "None",
     },
+  });
+};
+
+export const findOrCreateTftSummonerApiKey = async (
+  summoner: TftSummoner,
+  apiKey: string
+) => {
+  const tftApiKey = await TftApiKey.findOne({
+    where: {
+      riotApiKey: apiKey,
+    },
+  });
+  const tftSummonerApiKey = await TftSummonerApiKey.findOne({
+    where: {
+      tftSummonerId: summoner.tftSummonerId,
+      tftApiKeyId: tftApiKey?.tftApiKeyId,
+    },
+  });
+
+  if (tftSummonerApiKey) {
+    return tftSummonerApiKey;
+  }
+
+  const tftApi = new TftApi(apiKey);
+  const summonerDto = await tftApi.Summoner.getByName(
+    summoner.summonerName,
+    Regions.EU_WEST
+  );
+
+  return TftSummonerApiKey.create({
+    tftSummonerId: summoner.tftSummonerId,
+    tftApiKeyId: tftApiKey?.tftApiKeyId,
+    encryptedPlayerUuid: summonerDto.response.puuid,
+    encryptedSummonerId: summonerDto.response.id,
   });
 };

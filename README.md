@@ -16,5 +16,5 @@ Firstly create `./sequelize.json` file and fill in the following:
 
 Using sequelize-auto we can automatically generate the model files using the following command:
 
-`npx sequelize-auto -o "./models" -d lol -h localhost -c ./sequelize.json -e postgres --cm p --cf p --cp c -l ts`
+`npx sequelize-auto -o "./models" -d iloverice -h 35.197.241.115 -c ./sequelize.json -e postgres --cm p --cf p --cp c -l ts`
 
