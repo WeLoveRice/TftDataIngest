@@ -7,7 +7,6 @@ export interface TftApiKeyAttributes {
   riotApiKey: string;
 }
 
-// Some attributes are optional in `User.build` and `User.create` calls
 type TftApiKeyCreationAttributes = Optional<TftApiKeyAttributes, "tftApiKeyId">;
 
 export class TftApiKey
