@@ -6,6 +6,10 @@ import { upsertApiKeys } from "./database/apiKeyInit";
 import { ingestDataForHighElo } from "./ingest/summonerMatches";
 import { initKeys } from "./api/riot/keyManager";
 
+process.on("unhandledRejection", (up) => {
+  throw up;
+});
+
 export const main = async (): Promise<void> => {
   try {
     await Postgres.getSequelize();

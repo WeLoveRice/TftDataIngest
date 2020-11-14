@@ -1,5 +1,6 @@
 import fs from "fs-extra";
 import path from "path";
+import sleep from "sleep-promise";
 import { Redis } from "../redis";
 
 const keysFile = path.resolve(__dirname, "..", "..", "..", "riot-api-keys.txt");
@@ -15,7 +16,7 @@ export const initKeys = async () => {
     await redis.rpush(key, key);
   }
   await redis.quit();
-  setInterval(async () => await keyTransfer(apiKeys), 500);
+  setInterval(async () => await keyTransfer(apiKeys), 2000);
 };
 
 const keyTransfer = async (keys: string[]) => {
@@ -28,6 +29,16 @@ const keyTransfer = async (keys: string[]) => {
       }
     })
   );
+
+  await sleep(1000);
+  const keysInList = await redis.llen(REDIS_RIOT_KEYS);
+  for (let i = 0; i < keysInList; i++) {
+    const apiKey = await redis.lpop(REDIS_RIOT_KEYS);
+    if (apiKey) {
+      await redis.rpush(apiKey, apiKey);
+    }
+  }
+
   await redis.quit();
 };
 
