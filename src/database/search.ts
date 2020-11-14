@@ -8,6 +8,7 @@ import {
   TftUnit,
 } from "../../models/init-models";
 import { TftMatch } from "../../models/TftMatch";
+import { findApiKeyByRiotKey } from "./search/apiKey";
 export const findSummonerByName = async (
   name: string
 ): Promise<TftSummoner> => {
@@ -48,11 +49,8 @@ export const findOrCreateTftSummonerApiKey = async (
   summoner: TftSummoner,
   apiKey: string
 ) => {
-  const tftApiKey = await TftApiKey.findOne({
-    where: {
-      riotApiKey: apiKey,
-    },
-  });
+  const tftApiKey = await findApiKeyByRiotKey(apiKey);
+
   const tftSummonerApiKey = await TftSummonerApiKey.findOne({
     where: {
       tftSummonerId: summoner.tftSummonerId,
@@ -72,7 +70,7 @@ export const findOrCreateTftSummonerApiKey = async (
 
   return TftSummonerApiKey.create({
     tftSummonerId: summoner.tftSummonerId,
-    tftApiKeyId: tftApiKey?.tftApiKeyId,
+    tftApiKeyId: tftApiKey.tftApiKeyId,
     encryptedPlayerUuid: summonerDto.response.puuid,
     encryptedSummonerId: summonerDto.response.id,
   });

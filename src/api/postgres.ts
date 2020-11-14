@@ -30,8 +30,6 @@ export class Postgres {
       pool: {
         min: 0,
         max: 20,
-        acquire: 60000,
-        idle: 10000,
       },
     });
   }

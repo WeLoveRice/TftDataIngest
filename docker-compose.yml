@@ -5,10 +5,7 @@ services:
     build:
         context: .
         dockerfile: ./Dockerfile
-    env_file: .env.dev
-    volumes:
-        - .:/home/node/tft-match-fetcher
-    command: npm run start:dev
+    env_file: .env
     depends_on:
         - redis
   redis:

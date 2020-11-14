@@ -10,11 +10,12 @@ import { TftApiKey } from "../../models/TftApiKey";
 import { TftSummonerApiKey } from "../../models/TftSummonerApiKey";
 import { releaseKey } from "../api/riot/keyManager";
 import { getTftApi } from "../api/riot/riot";
+import { findApiKeyByRiotKey } from "./search/apiKey";
 import { initSummonerApiKey } from "./summonerApiKeyInit";
 
 const fetchMatchListBySummoner = async (summoner: TftSummoner) => {
   const [tftApi, apiKey] = await getTftApi();
-  const tftApiKey = await TftApiKey.findOne({ where: { riotApiKey: apiKey } });
+  const tftApiKey = await findApiKeyByRiotKey(apiKey);
   let tftSummonerApiKey = await TftSummonerApiKey.findOne({
     where: {
       tftSummonerId: summoner.tftSummonerId,

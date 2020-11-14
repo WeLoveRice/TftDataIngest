@@ -5,10 +5,14 @@ export const findApiKeyByRiotKey = async (
   riotApiKey: string,
   transaction?: Transaction
 ) => {
-  return TftApiKey.findOne({
+  const tftApiKey = await TftApiKey.findOne({
     where: {
       riotApiKey,
     },
     transaction,
   });
+  if (!tftApiKey) {
+    throw new Error(`Cannot find tftApiKey by riotApiKey ${riotApiKey}`);
+  }
+  return tftApiKey;
 };

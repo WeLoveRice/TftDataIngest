@@ -69,11 +69,17 @@ export const getParticipantFromMatch = async (
 export const fetchLeagueBySummonerApiKey = async (
   summonerApiKey: TftSummonerApiKey
 ): Promise<ApiResponseDTO<LeagueEntryDTO[]>> => {
-  const { riotApiKey } = await TftApiKey.findByPk(summonerApiKey.tftApiKeyId);
+  const tftApiKey = await TftApiKey.findByPk(summonerApiKey.tftApiKeyId);
+  if (!tftApiKey) {
+    throw new Error(
+      `Cannot find tftApiKey by pk ${summonerApiKey.tftApiKeyId}`
+    );
+  }
 
+  const { riotApiKey } = tftApiKey;
   await getSpecificKey(riotApiKey);
   const tftApi = new TftApi(riotApiKey);
-  const league = tftApi.League.get(
+  const league = await tftApi.League.get(
     summonerApiKey.encryptedSummonerId,
     Regions.EU_WEST
   );

@@ -2,7 +2,7 @@ import { promises } from "fs-extra";
 import sleep from "sleep-promise";
 import { LeagueApi } from "twisted/dist/apis/lol/league/league";
 import { Regions } from "twisted/dist/constants";
-import { LeagueListDTO } from "twisted/dist/models-dto";
+import { LeagueListDTO, SummonerV4DTO } from "twisted/dist/models-dto";
 import {
   TftApiKey,
   TftSummonerApiKey,
@@ -58,7 +58,7 @@ const processLeague = async (league: LeagueListDTO, eloTime: Date) => {
     if (!summonerDto) {
       continue;
     }
-    const { id, name, puuid } = summonerDto.response;
+    const { id, name, puuid } = summonerDto;
     const transaction = await Postgres.newTransaction();
     const [summoner] = await TftSummoner.findOrCreate({
       where: {
@@ -103,11 +103,13 @@ const processLeague = async (league: LeagueListDTO, eloTime: Date) => {
   }
 };
 
-const getSummonerByName = async (name: string) => {
+const getSummonerByName = async (
+  name: string
+): Promise<[SummonerV4DTO, string] | [null, null]> => {
   const [tftApi, key] = await getTftApi();
   try {
     const summoner = await tftApi.Summoner.getByName(name, Regions.EU_WEST);
-    return [summoner, key];
+    return [summoner.response, key];
   } catch (error) {
     console.log(`Error finding ${name}`);
     return [null, null];

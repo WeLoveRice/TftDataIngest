@@ -1,6 +1,6 @@
 import { TftApi } from "twisted";
 import { Regions } from "twisted/dist/constants";
-import { TftSummoner } from "../../models/init-models";
+import { TftApiKey, TftSummoner } from "../../models/init-models";
 import { TftSummonerApiKey } from "../../models/TftSummonerApiKey";
 
 export const initSummonerApiKey = async (

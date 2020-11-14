@@ -54,6 +54,11 @@ export const initSummonerByApiKey = async (
     const summoner = await TftSummoner.findByPk(
       tftSummonerApiKey.tftSummonerId
     );
+    if (!summoner) {
+      throw new Error(
+        `Should have found summoner from tftSummonerApiKey by id ${tftSummonerApiKey.tftSummonerId}`
+      );
+    }
     return [tftSummonerApiKey, summoner];
   }
 
