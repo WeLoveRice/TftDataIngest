@@ -17,7 +17,7 @@ import { getKey, getSpecificKey, releaseKey } from "./keyManager";
 export const getTftApi = async (): Promise<[TftApi, string]> => {
   const key = await getKey();
 
-  return [new TftApi(key), key];
+  return [new TftApi({ key: key, rateLimitRetry: false }), key];
 };
 
 export const getSummoner = async (

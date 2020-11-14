@@ -16,7 +16,7 @@ export const initKeys = async () => {
     await redis.rpush(key, key);
   }
   await redis.quit();
-  setInterval(async () => await keyTransfer(apiKeys), 2000);
+  setInterval(async () => await keyTransfer(apiKeys), 1000);
 };
 
 const keyTransfer = async (keys: string[]) => {
@@ -30,7 +30,7 @@ const keyTransfer = async (keys: string[]) => {
     })
   );
 
-  await sleep(1000);
+  await sleep(500);
   const keysInList = await redis.llen(REDIS_RIOT_KEYS);
   for (let i = 0; i < keysInList; i++) {
     const apiKey = await redis.lpop(REDIS_RIOT_KEYS);

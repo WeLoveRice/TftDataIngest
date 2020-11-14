@@ -22,7 +22,12 @@ export const ingestDataForHighElo = async () => {
   });
 
   for await (const summonerElo of summonerElos) {
-    await ingestForSummoner(summonerElo);
+    try {
+      await ingestForSummoner(summonerElo);
+    } catch (error) {
+      logger.error(error);
+      continue;
+    }
   }
 };
 
