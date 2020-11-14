@@ -6,7 +6,7 @@ export class Redis {
 
   static connect = async () => {
     const logger = createLogger();
-    const client = new IORedis(6379, "redis");
+    const client = new IORedis(6380, "redis");
 
     client.on("error", (error) => {
       logger.error(`redis error: ${error}`);
